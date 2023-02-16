@@ -6,6 +6,8 @@ To generate all the IRFs in the paper and appendix, open "0_Main.R", change the 
 
 It will run through the models and output the required output for the paper in the folder called "Output", which can then be uploaded to Overleaf.
 
+
+
 **B: General workflow:**
 
 * A number of scenarios assigned to "type" are found in 0_Main.R. 
