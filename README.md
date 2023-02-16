@@ -8,7 +8,9 @@ It will run through the models and output the required output for the paper in t
 
 **B: General workflow:**
 
-A number of scenarios assigned to "type" are found in 0_Main.R. For several of these model types, the following seven 7 scripts are called (those cases where a panel chart with all five models is generated in the end). For other model types, only the scripts with 1_.. are called (those cases where only the BPSS BVAR is used)
+* A number of scenarios assigned to "type" are found in 0_Main.R. 
+* For several of these model types, the following seven 7 scripts are called (those cases where a panel chart with all five models is generated in the end). 
+* For other model types, only the scripts with 1_.. are called (those cases where only the BPSS BVAR is used)
 
 
 **1_vol_bvar_calibration.R:** Provides the calibration for all scenarios (variable in the BPSS BVAR, Bayesian parameters, configuration for the IRFs etc)
