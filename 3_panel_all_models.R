@@ -85,11 +85,15 @@ if (vfci_pair == "ff") {
 export_pdf <- 1                  ##### CONFIG 4 #####
 
 if (export_pdf == 1) {
-  fname <- paste0(path,"/output/",vfci_pair,'-vfci-',type,'.pdf', sep = '')
+  if (type == "baseline") {
+    fname <- paste0(path,"/output/baseline/",vfci_pair,'-vfci-',type,'.pdf', sep = '')
+  } else {
+    fname <- paste0(path,"/output/appendix/",vfci_pair,'-vfci-',type,'.pdf', sep = '')
+  }
   if (vfci_pair == "ff") {
       pdf(fname, width = 8, height = 11)
   } else {
-    pdf(fname, width = 8, height = 11*(4/5))
+      pdf(fname, width = 8, height = 11*(4/5))
   }
 }
 

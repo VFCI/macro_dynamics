@@ -23,7 +23,7 @@ if (avg_regime == 1 & type == "baseline") {
     #Export to TeX
     library("xtable")
     tab<-xtable(table_rel_variance,  align=c("l","c","c","c","c","c","c","c"))
-    print(tab,file="output/table_rel_var.tex",append=F)
+    print(tab,file="output/baseline/table_rel_var.tex",append=F)
 }
 
 #-------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ save(ir,file = paste(filename,'_ir.Rdata',sep=''))
           color = c(0,0.6,0), ##Color of IRFs
           nsteps = irf_steps,
           varnames = var_names,
-          filename = paste(filename,'_irplot_all_shocks',sep=''),
+          filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
           width = 9, height = 7,savedata = FALSE,newplot = TRUE)
         
         #--------------------------------------------------
@@ -83,7 +83,7 @@ save(ir,file = paste(filename,'_ir.Rdata',sep=''))
           color = c(0,0.6,0), 
           nsteps = irf_steps,
           varnames = var_names,
-          filename = paste(filename,'_irplot_all_shocks',sep=''),
+          filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
           width = 9, height = 7,savedata = FALSE,newplot = TRUE)
    
  } else if (length(vars == 5)) {
@@ -103,7 +103,7 @@ save(ir,file = paste(filename,'_ir.Rdata',sep=''))
      color = c(0,0.6,0), ##Color of IRFs
      nsteps = irf_steps,
      varnames = var_names,
-     filename = paste(filename,'_irplot_all_shocks',sep=''),
+     filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
      format = 'pdf',#'r_plot',
      width = 9, height = 7,savedata = FALSE,newplot = TRUE)
    
@@ -121,7 +121,7 @@ save(ir,file = paste(filename,'_ir.Rdata',sep=''))
      color = c(0,0.6,0), ##Color of IRFs
      nsteps = irf_steps,
      varnames = var_names,
-     filename = paste(filename,'_irplot_all_shocks',sep=''),
+     filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
      width = 9, height = 7,savedata = FALSE,newplot = TRUE)
  }
 
@@ -144,7 +144,7 @@ if (type == "baseline") {
       nsteps = irf_steps,
       varnames = var_names,
       shocknames = shock_names,
-      filename = paste(filename,'_irplot_all_shocks',sep=''),
+      filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
       blocks = blocks,
       width = 6, height = 8)
   }
@@ -174,7 +174,7 @@ if (type == "baseline") {
       color = c(0,0.6,0), ##Color of IRFs
       nsteps = irf_steps,
       varnames = var_names,
-      filename = paste('output/irplot_all_shocks','_reg_',r,sep=''),
+      filename = paste('output/appendix/irplot_all_shocks','_reg_',r,sep=''),
       format = 'pdf',#'r_plot',
       width = 9, height = 7,savedata = FALSE,newplot = TRUE)
     
@@ -193,7 +193,7 @@ if (type == "baseline") {
       color = c(0,0.6,0), ##Color of IRFs
       nsteps = irf_steps,
       varnames = var_names,
-      filename = paste('output/irplot_all_shocks','_reg',r,sep=''),
+      filename = paste('output/appendix/irplot_all_shocks','_reg',r,sep=''),
       width = 9, height = 7,savedata = FALSE,newplot = TRUE)
     
      print(r)

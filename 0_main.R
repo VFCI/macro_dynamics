@@ -25,14 +25,14 @@ source('load_functions.R')
 load_functions() 
 
 #-------------------------------------------------------------------------------
-#0. Load Data
+#1. Load Data
 #-------------------------------------------------------------------------------
 
 vfci_data <- openxlsx::readWorkbook("dataset_vfci_feb2023.xlsx")
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
 
 #-------------------------------------------------------------------------------
-#1. Results in Paper
+#2. Results in Paper
 #-------------------------------------------------------------------------------
 
 # Main results of paper 
@@ -57,7 +57,7 @@ for (i in ff_y) {
 
 
 #-------------------------------------------------------------------------------
-#2. Robustness of the five identification schemes [Internet Appendix]
+#3. Robustness of the five identification schemes [Internet Appendix]
 #-------------------------------------------------------------------------------
 
 #Robustness
@@ -87,7 +87,7 @@ for (i in five_model_robustness) {
 }
 
 #-------------------------------------------------------------------------------
-#3.  Robustness of the heteroskedastic BVAR [Internet Appendix]
+#4.  Robustness of the heteroskedastic BVAR [Internet Appendix]
 #-------------------------------------------------------------------------------
 
 #Robustness
@@ -133,4 +133,4 @@ for (i in vol_bvar_robustness_b) {
 #       source('1_vol_bvar_output.R')
 #
 # "[insert type of model here]" to be replaced by one or more of the following options where convergence fails
-# "baseline", "regimes", "stationary", "vfci_lev", "pre_crisis", "normal", "100k", "horserace_gz", "horserace_tedr","horserace_ecy", "horserace_gsfci", "horserace_nfci"
+# "baseline", "regimes", "stationary", "vfci_lev", "pre_crisis", "normal", "100k", "horserace_gz", "horserace_tedr","horserace_ecy", "horserace_nfci"
