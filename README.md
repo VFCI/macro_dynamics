@@ -2,13 +2,11 @@
 
 **A. How to run this:**
 
-To generate all the IRFs in the paper and appendix, open "0_Main.R", change the directory in line 20, and run the script.
-
-It will run through the models and output the required output for the paper in the folder called "Output", which can then be uploaded to Overleaf.
+To generate all the IRFs in the paper and appendix, open "0_Main.R", change the directory in line 20, and run the script. It will run through the models and output the required output for the paper in the folder called "Output", which can then be uploaded to Overleaf.
 
 
 
-**B: General workflow:**
+**B: General workflow of the code:**
 
 * A number of scenarios assigned to "type" are found in 0_Main.R. 
 * For several of these model types, the following seven 7 scripts are called (those cases where a panel chart with all five models is generated in the end). 
