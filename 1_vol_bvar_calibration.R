@@ -150,7 +150,7 @@ mn_tight_calib <- 3
 mn_decay_calib <- 0.5
 if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci") {
   mn_tight_calib <- 0.5     # with second financial variable
-S}  
+}  
 
 #-------------------------------------------------------------------------------
 #4. Calibration for MCMC algorithm
