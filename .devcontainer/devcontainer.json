@@ -1,8 +1,0 @@
-{
-    "name": "${localWorkspaceFolderBasename}",
-    "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2.2",
-    "features": {
-      "ghcr.io/devcontainers/features/git:1": {},
-      "ghcr.io/rocker-org/devcontainer-features/renv-cache:0": {}
-    }
-}
