@@ -3,7 +3,7 @@
 {
 	"name": "R (rocker/r-ver base)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2",
+	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
