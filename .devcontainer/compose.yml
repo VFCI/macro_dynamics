@@ -6,7 +6,6 @@ services:
     ports:
       - "8787:8787"
     environment:
-      USER: rstudio
       PASSWORD: vfci
     volumes:
       - ./.rstudio_config:/home/rstudio/.config/rstudio

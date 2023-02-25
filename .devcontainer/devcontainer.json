@@ -7,10 +7,6 @@
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
-
-	"containerEnv": {
-  	  "USER": "rstudio"
-	}
 	
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -20,6 +16,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	//"postCreateCommand": "./.devcontainer/open_RStudio.sh",
+	"postCreateCommand": "docker compose -f .devcontainer/compose.yml up"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
