@@ -6,10 +6,9 @@ services:
     ports:
       - "8787:8787"
     environment:
-      PASSWORD: vfci
+      DISABLE_AUTH: true
     volumes:
       - ./.rstudio_config:/home/rstudio/.config/rstudio
       - ~/workspace:/home/rstudio/workspace
       - /workspaces/macro_dynamics:/home/rstudio/macro_dynamics
-    command: ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize", "0", "--auth-none", "1"]
       
