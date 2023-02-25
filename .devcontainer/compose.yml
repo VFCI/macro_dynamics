@@ -2,7 +2,7 @@
 
 services:
   rstudio:
-    image: rocker/verse
+    image: rocker/verse:4
     ports:
       - "8787:8787"
     environment:
