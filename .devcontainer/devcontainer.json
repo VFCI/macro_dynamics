@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/rocker-org/devcontainer-templates/tree/main/src/r-ver
 {
-	"name": "R (rocker/r-ver base)",
+	"name": "R (rocker/verse)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "ghcr.io/rocker-org/devcontainer/verse:4.2",
 	"features": {
