@@ -3,7 +3,7 @@
 {
 	"name": "R (rocker/r-ver base)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2",
+	"image": "ghcr.io/rocker-org/devcontainer/verse:4.2",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
@@ -16,7 +16,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	//"postCreateCommand": "./.devcontainer/open_RStudio.sh",
-	//"postCreateCommand": "docker run --rm -ti -e DISABLE_AUTH=true -p 127.0.0.1:8787:8787 rocker/tidyverse && docker compose -f .devcontainer/compose.yml up"
+	//"postCreateCommand": "docker run --rm -ti -e DISABLE_AUTH=true -p 127.0.0.1:8787:8787 rocker/verse && docker compose -f .devcontainer/compose.yml up"
 	//"postCreateCommand": "docker compose -f .devcontainer/compose.yml up && other command",
 	//docker run --rm -ti -e USERID=1001 -e GROUPID=1001 --user rstudio rocker/tidyverse bash
 	
