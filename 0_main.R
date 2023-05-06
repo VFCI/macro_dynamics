@@ -17,7 +17,8 @@
 
 # Clear workspace and set path
 rm(list=ls(all = TRUE))
-path <- "//data4/users2/TIyer/My Documents/vfci_feb2023"
+#path <- "//data4/users2/TIyer/My Documents/vfci_feb2023"
+path <- getwd()
 setwd(path)
 
 # Load functions and packages
@@ -32,10 +33,10 @@ vfci_data <- openxlsx::readWorkbook("dataset_vfci_feb2023.xlsx")
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
 
 #-------------------------------------------------------------------------------
-#2. Results in Paper
+#2. Main results
 #-------------------------------------------------------------------------------
 
-# Main results of paper 
+# Baseline results
 type <- "baseline"
 
 # Volatility BVAR
@@ -55,9 +56,8 @@ for (i in ff_y) {
   source('3_panel_all_models.R')
 }
 
-
 #-------------------------------------------------------------------------------
-#3. Robustness of the five identification schemes [Internet Appendix]
+#3. Robustness of the five identification schemes 
 #-------------------------------------------------------------------------------
 
 #Robustness
@@ -87,7 +87,7 @@ for (i in five_model_robustness) {
 }
 
 #-------------------------------------------------------------------------------
-#4.  Robustness of the heteroskedastic BVAR [Internet Appendix]
+#4.  Robustness of the heteroskedastic BVAR 
 #-------------------------------------------------------------------------------
 
 #Robustness
@@ -115,12 +115,6 @@ for (i in vol_bvar_robustness_b) {
   source('1_vol_bvar_estimation.R')
   source('1_vol_bvar_output.R')
 }
-
-# Other robustness checks conducted but not reported in the appendix include:
-  # alternate specifications of the tightness and decay parameters
-  # alternate versions of VFCI with alternate PCs and with original variables instead of the PCs
-  # alternate draws of the MCMC chain
-# These additional checks also corroborate the baseline results.
 
 #-------------------------------------------------------------------------------
 
