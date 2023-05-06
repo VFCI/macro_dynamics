@@ -29,7 +29,9 @@ load_functions()
 #1. Load Data
 #-------------------------------------------------------------------------------
 
-vfci_data <- openxlsx::readWorkbook("dataset_vfci_feb2023.xlsx")
+load("variables.RData")
+#vfci_data <- openxlsx::readWorkbook("dataset_vfci_feb2023.xlsx")
+vfci_data <- variables
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
 
 #-------------------------------------------------------------------------------
