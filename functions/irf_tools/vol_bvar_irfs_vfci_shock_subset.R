@@ -130,7 +130,7 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
 
       ptitle = ifelse(sstruct=="TO",paste(varnames[varind],"shock to",varnames[j],sep=" "),
                       paste(varnames[j],"shock to",varnames[varind],sep=" "))## name of data series
-      if (is.na(y_axis_custom)){
+      if (sum(unlist(lapply(yaxis_vfci_shock,is.na))) > 0){
       plot(irnew[j,],
            ylim = response_ylim[j,],
            type = 'l',
