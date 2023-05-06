@@ -6,10 +6,11 @@
 # Date: Feb 2023
 #-------------------------------------------------------------------------------
 
-
 #-------------------------------------------------------------------------------
 # Calculate posterior
 #-------------------------------------------------------------------------------
+
+set.seed(1234)
 
 optout         = TvvDir(input_in_var, 
     freq       = 'quarterly',
@@ -46,7 +47,7 @@ if (disperse){
 if (my_choice == 'gaussian'){
     mcmc_output = gdraw(optout,
                         ndraw = ndraw,
-                        nburn = 0,
+                        nburn = 1000,
                         nsep = nsep,
                         filename = paste(filename,'.Rdata',sep=''),
                         savespots = savespots,
@@ -64,7 +65,7 @@ if (my_choice == 'gaussian'){
     
     mcmc_output = gdraw(optout,
                         ndraw = ndraw,
-                        nburn = 0,
+                        nburn = 1000,
                         nsep = nsep,
                         filename = paste(filename,'.Rdata',sep=''),
                         savespots = savespots,

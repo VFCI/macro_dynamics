@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
 # Paper: The Market Price of Risk and Macro-Financial Dynamics
 # Purpose: Collection of results from five identification schemes for VFCI
-  # 1. Volatility BVAR
-  # 2. SVAR-IV
-  # 3. LP-IV
-  # 4. Cholesky
-  # 5. Sign restrictions
+# 1. Volatility BVAR
+# 2. SVAR-IV
+# 3. LP-IV
+# 4. Cholesky
+# 5. Sign restrictions
 # Author: Tara Iyer
 # Date: Feb 2023
 #-------------------------------------------------------------------------------
