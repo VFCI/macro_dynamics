@@ -1,14 +1,16 @@
 ## Install all required packages
 
-package_list = c('Matrix','MASS','parallel','abind','coda','openxlsx', 'dplyr','ggplot2','reshape2', 'xtable', 'lpirfs', 'sovereign', 'VARsignR', 'openxlsx', 'vars', 'ggplot2', 'ggpubr', 'gridExtra')
+package_list = c('devtools','Matrix','MASS','abind','coda','openxlsx', 'dplyr','ggplot2','reshape2', 'xtable', 'lpirfs', 'sovereign','HI', 'mvnfast', 'VARsignR', 'openxlsx', 'vars', 'ggplot2', 'ggpubr', 'gridExtra')
 
 for (x in package_list){
-    if (!require(x,character.only = TRUE))
-	{
-		install.packages(x,dep=TRUE)
-		if(!require(x,character.only = TRUE)) stop("Package not found")
+    if (identical(system.file(package=x),"")){
+		install.packages(x,dep=TRUE,quiet = TRUE)
+		if (identical(system.file(package=x),"")){
+			devtools::install_version(x,version=NULL,repos="http://cran.r-project.org",dependencies=FALSE)
+		}
 	}
-    return("OK")
-    library(x)
+    print("OK")
+    
+    library(x,character.only=TRUE)
 }
 
