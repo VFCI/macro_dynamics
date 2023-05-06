@@ -117,14 +117,3 @@ for (i in vol_bvar_robustness_b) {
 }
 
 #-------------------------------------------------------------------------------
-
-# NOTE: In case '1_vol_bvar_estimation.R' results in non-convergence (rare but possible due to randomness in the optimizer algorithm),
-#       then do not change anything in the code but just run it again. Specifically, run:
-#
-#       type = "[insert type of model here]" 
-#       source('1_vol_bvar_calibration.R')
-#       source('1_vol_bvar_estimation.R')
-#       source('1_vol_bvar_output.R')
-#
-# "[insert type of model here]" to be replaced by one or more of the following options where convergence fails
-# "baseline", "regimes", "stationary", "vfci_lev", "pre_crisis", "normal", "100k", "horserace_gz", "horserace_tedr","horserace_ecy", "horserace_nfci"
