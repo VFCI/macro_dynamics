@@ -1,28 +1,7 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/rocker-org/devcontainer-templates/tree/main/src/r-ver
 {
 	"name": "R (rocker/tidyverse)",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
-	
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	//"postCreateCommand": "./.devcontainer/open_RStudio.sh",
-	//"postCreateCommand": "docker run --rm -ti -e DISABLE_AUTH=true -p 127.0.0.1:8787:8787 rocker/verse && docker compose -f .devcontainer/compose.yml up"
-	//"postCreateCommand": "docker compose -f .devcontainer/compose.yml up && other command",
-	//docker run --rm -ti -e USERID=1001 -e GROUPID=1001 --user rstudio rocker/tidyverse bash
-	
-	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }
