@@ -83,7 +83,7 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k") {
   
 }
 
-input_in_var <- vfci_data[, c("date", vars_in_system)]
+input_in_var <- as.data.frame(vfci_data[, c("date", vars_in_system)])
 
 #-------------------------------------------------------------------------------
 # 2. Specifying average or regime-specific IRFs
