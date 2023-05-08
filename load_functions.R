@@ -1,6 +1,6 @@
 load_functions = function() {
   
-  folders = c('functions/bpss_tools','functions/opt_tools','functions/var_tools','functions/irf_tools')
+  folders = c('functions/bpss_tools','functions/opt_tools','functions/var_tools','functions/irf_tools','functions/vfci_tools')
   
   ## enumerating all the functions and sourcing them
   for (ifolder in folders) {
