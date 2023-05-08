@@ -1,6 +1,7 @@
 ## Install all required packages
 install.packages("renv")
 renv::restore(prompt=FALSE)
+renv::install("https://github.com/jrnold/stataXml/")
 
 package_list = c('devtools','Matrix','MASS','abind','coda','openxlsx', 'dplyr','ggplot2','reshape2', 'xtable', 'lpirfs', 'sovereign','HI', 'mvnfast', 'VARsignR', 'openxlsx', 'vars', 'ggplot2', 'ggpubr', 'gridExtra')
 
