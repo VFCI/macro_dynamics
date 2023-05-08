@@ -11,8 +11,8 @@
 #-------------------------------------------------------------------------------
 
 # Load data
-load(paste0(path,"/output/","mcmc_out_",type,"_ir",".Rdata"))
-load(paste0(path,"/output/","svariv_lpiv_chol_sn_",type,".Rdata"))
+load(here::here(paste0("output/","mcmc_out_",type,"_ir",".Rdata")))
+load(here::here(paste0("output/","svariv_lpiv_chol_sn_",type,".Rdata")))
 
 #-------------------------------------------------------------------------------
 # Note - There are 4 configurable parameters 
@@ -86,9 +86,9 @@ export_pdf <- 1                  ##### CONFIG 4 #####
 
 if (export_pdf == 1) {
   if (type == "baseline") {
-    fname <- paste0(path,"/output/baseline/",vfci_pair,'-vfci-',type,'.pdf', sep = '')
+    fname <- here::here(paste0("output/baseline/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
   } else {
-    fname <- paste0(path,"/output/appendix/",vfci_pair,'-vfci-',type,'.pdf', sep = '')
+    fname <- here::here(paste0("output/appendix/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
   }
   if (vfci_pair == "ff") {
       pdf(fname, width = 8, height = 11)

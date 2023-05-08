@@ -11,6 +11,7 @@
 
 save(df_irf_ff, df_irf_vfci, df_irf_y, results_lin_iv_ff, results_lin_iv_vfci, 
      results_lin_iv_y, chol_irf_vfci, irfs_mp, irfs_vfci, 
-     file=paste0(path,"/output","/svariv_lpiv_chol_sn_",type,".Rdata"))
+     file=here::here(paste0("output","/svariv_lpiv_chol_sn_",type,".Rdata")))
+
 
 #-------------------------------------------------------------------------------
