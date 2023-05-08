@@ -26,6 +26,7 @@ source('load_functions.R')
 load_functions() 
 
 source('create_vfci_and_instruments.R')
+source('create_figures.R')
 
 #-------------------------------------------------------------------------------
 #1. Load Data
