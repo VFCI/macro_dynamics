@@ -1,12 +1,16 @@
 # Preliminary ------------------------------------------------------------------
+path <- getwd()
+setwd(path)
+
 ## Load functions and packages
 source('load_functions.R')
+
 load_functions() 
 source('create_vfci_and_instruments.R')
 source('create_figures.R')
 
 # Load Data --------------------------------------------------------------------
-load("variables.RData")
+base::load("variables.RData")
 vfci_data <- variables
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
 
@@ -70,7 +74,7 @@ for (i in five_model_robustness) {
 # 9. Horserace with NFCI
 # 10. 100,000 draws in the MCMC chain
 
-vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k")  
+vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k", "1M")  
 for (i in vol_bvar_robustness_a) {
   type = i
   source('1_vol_bvar_calibration.R')
