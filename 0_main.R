@@ -73,6 +73,7 @@ for (i in five_model_robustness) {
 # 8. Horserace with TEDR
 # 9. Horserace with NFCI
 # 10. 100,000 draws in the MCMC chain
+# 11. 1 million draws in the MCMC chain
 
 vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k", "1M")  
 for (i in vol_bvar_robustness_a) {
