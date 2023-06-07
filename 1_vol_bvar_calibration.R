@@ -1,17 +1,9 @@
 #-------------------------------------------------------------------------------
-# Paper: The Market Price of Risk and Macro-Financial Dynamics 
-# Purpose: Calibration of the time-varying heteroskedastic BVAR
-# Adapted from BPSS (AER, 2021)
-# Author: Tara Iyer
-# Date: Feb 2023
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
 # 1. Specifying the data input into the BVAR and IRFs
 #-------------------------------------------------------------------------------
 
 #Variables
-if (type == "baseline" | type == "pre_crisis" | type == "100k") {
+if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
@@ -170,6 +162,8 @@ disperse = TRUE ## if TRUE, disperse the starting point using inverse hessian as
 total_draws <- 10000
 if (type == "100k") {
   total_draws <- 100000
+} else if (type == "1M") {
+  total_draws <- 1000000
 }
 draws_step <- 100
 ndraw = total_draws ## total draws to record 

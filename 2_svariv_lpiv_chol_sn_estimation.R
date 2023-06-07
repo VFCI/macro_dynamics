@@ -1,14 +1,3 @@
-#-------------------------------------------------------------------------------
-# Paper: The Market Price of Risk and Macro-Financial Dynamics
-# Purpose: Estimates the following four identification schemes for VFCI
-# 1. SVAR-IV
-# 2. LP-IV
-# 3. Cholesky
-# 4. Sign restrictions
-# Author: Tara Iyer
-# Date: Feb 2023
-#-------------------------------------------------------------------------------
-
 #--------------------------------------------------------------------
 #Model 1: SVAR-IV 
 #--------------------------------------------------------------------

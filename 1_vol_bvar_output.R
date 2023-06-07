@@ -1,12 +1,4 @@
 #-------------------------------------------------------------------------------
-# Paper: The Market Price of Risk and Macro-Financial Dynamics 
-# Purpose: Output from the time-varying heteroskedastic BVAR
-# Adapted from BPSS (AER, 2021)
-# Author: Tara Iyer
-# Date: Feb 2023
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
 # Relative variances per regime (for baseline model)
 #-------------------------------------------------------------------------------
 if (avg_regime == 1 & type == "baseline") {

@@ -1,12 +1,4 @@
 #-------------------------------------------------------------------------------
-# Paper: The Market Price of Risk and Macro-Financial Dynamics 
-# Purpose: Estimation of the time-varying heteroskedastic BVAR
-# Adapted from BPSS (AER, 2021)
-# Author: Tara Iyer
-# Date: Feb 2023
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
 # Calculate posterior
 #-------------------------------------------------------------------------------
 
