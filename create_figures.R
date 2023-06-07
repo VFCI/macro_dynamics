@@ -9,7 +9,7 @@ library(ggplot2)
 ## Figure 1. Standardized FCI figure ---------------------------------------
 # pick dates, variables
 
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1970 Q1"
 date_end <- "2022 Q3"
 
@@ -39,7 +39,7 @@ p %>% print
 
 ##  Figure 2. VFCI ----------------------------------------------------------
 
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
@@ -65,7 +65,7 @@ p %>% print
 
 
 ## Figure 3. Conditional mean and variance --------------------------------
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
@@ -100,7 +100,7 @@ p %>% print
 
 
 ## Figure 9. GDP and PCE VFCI ---------------------------------------------
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
@@ -135,7 +135,7 @@ p <- ggplot(as.data.frame(variables_fig9), aes(qtr)) +
 p %>% print
 
 ## Figure 10. PCA and Indiv VFCI ------------------------------------------
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
@@ -167,7 +167,7 @@ p <- ggplot(as.data.frame(variables_fig10), aes(qtr)) +
 p %>% print
 
 ## Figure 11. US and EA VFCI ----------------------------------------------
-load(file = here::here("variables.RData"))
+base::load(file = here::here("variables.RData"))
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
