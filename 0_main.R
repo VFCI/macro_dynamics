@@ -1,18 +1,23 @@
+rm(list=ls())
 # Preliminary ------------------------------------------------------------------
+path<-setwd("/Users/Spicey51/Desktop/macro_dynamics-main")
 path <- getwd()
 setwd(path)
 
 ## Load functions and packages
 source('load_functions.R')
-
 load_functions() 
-source('create_vfci_and_instruments.R')
-source('create_figures.R')
+
+#source('create_vfci_and_instruments.R')
+#source('create_figures.R')
 
 # Load Data --------------------------------------------------------------------
 base::load("variables.RData")
 vfci_data <- variables
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
+
+#Set lags for all models
+nlags    <- 4
 
 # Main results -----------------------------------------------------------------
 ## Baseline results ------------------------------------------------------------
@@ -27,6 +32,11 @@ source('1_vol_bvar_output.R')
 source('2_svariv_lpiv_chol_sn_calibration.R')
 source('2_svariv_lpiv_chol_sn_estimation.R')
 source('2_svariv_lpiv_chol_sn_output.R')
+
+### Export Residuals when running baseline  ------------------------------------
+if(type  == "baseline"){
+	source("3_create_residual_mat.R")
+}
 
 ### Panel: All models ----------------------------------------------------------
 ff_y <- c("ff", "y")
@@ -73,9 +83,9 @@ for (i in five_model_robustness) {
 # 8. Horserace with TEDR
 # 9. Horserace with NFCI
 # 10. 100,000 draws in the MCMC chain
-# 11. 1 million draws in the MCMC chain
+# 11. 1M draws in the MCMC chain
 
-vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k", "1M")  
+vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k") #1M  
 for (i in vol_bvar_robustness_a) {
   type = i
   source('1_vol_bvar_calibration.R')
@@ -85,6 +95,21 @@ for (i in vol_bvar_robustness_a) {
  
 vol_bvar_robustness_b <- c("horserace_gz", "horserace_tedr","horserace_ecy", "horserace_nfci")  
 for (i in vol_bvar_robustness_b) {
+  type = i
+  source('1_vol_bvar_calibration.R')
+  source('1_vol_bvar_estimation.R')
+  source('1_vol_bvar_output.R')
+}
+
+# Other robustness checks (not in Appendix) ------------------------------------
+#Robustness
+# 12. Add both GZ and TED
+# 13. Remove VFCI and add GZ
+# 14. Remove VFCI and add TED
+# 15. Remove VFCI and add both GZ and TED
+
+vol_bvar_robustness_c <- c("horserace_gz_tedr", "horserace_no_vfci_yes_gz","horserace_no_vfci_yes_tedr", "horserace_no_vfci_yes_gz_tedr")  
+for (i in vol_bvar_robustness_c) {
   type = i
   source('1_vol_bvar_calibration.R')
   source('1_vol_bvar_estimation.R')

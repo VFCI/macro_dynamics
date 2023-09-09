@@ -1,4 +1,4 @@
-package_list = c('devtools','Matrix','MASS','abind','coda','openxlsx','zoo','dplyr','ggplot2','reshape2', 'xtable', 'lpirfs', 'sovereign','HI', 'mvnfast', 'VARsignR', 'openxlsx', 'vars', 'ggplot2', 'ggpubr','dint','gridExtra','PerformanceAnalytics','tidyquant','tsibble','gsl','copula','svars','here', 'renv')
+package_list = c('devtools','Matrix','MASS','abind','coda','openxlsx','zoo','dplyr','ggplot2','reshape2', 'xtable', 'lpirfs', 'sovereign','HI', 'mvnfast', 'VARsignR', 'openxlsx', 'vars', 'ggplot2', 'ggpubr','dint','gridExtra','PerformanceAnalytics','tidyquant','tsibble','gsl','copula','svars','here', 'renv','corrplot','mvnormalTest')
 
 for (x in package_list){
     if (identical(system.file(package=x),"")){

@@ -2,8 +2,8 @@
 #-------------------------------------------------------------------------------
 
 # Load data
-load(here::here(paste0("output/","mcmc_out_",type,"_ir",".Rdata")))
-load(here::here(paste0("output/","svariv_lpiv_chol_sn_",type,".Rdata")))
+base::load(here::here(paste0("output/","mcmc_out_",type,"_ir",".Rdata")))
+base::load(here::here(paste0("output/","svariv_lpiv_chol_sn_",type,".Rdata")))
 
 #-------------------------------------------------------------------------------
 # Note - There are 4 configurable parameters 
@@ -26,8 +26,8 @@ if (vfci_pair == "ff") {
 #      For baseline as well as for robustness
 
 if (vfci_pair == "ff") {
-  col1 <- "MP shock to VFCI"
-  col2 <- "VFCI shock to MP" 
+  col1 <- "Fed Funds shock to VFCI"
+  col2 <- "VFCI shock to Fed Funds" 
   vol_bvar_second_var <- "Fed Funds"
   vol_bvar_type_vfci <- var_names[3]
   GDP_FF_FOR_IV <- "fedfunds"

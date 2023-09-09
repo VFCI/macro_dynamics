@@ -1,4 +1,11 @@
 #-------------------------------------------------------------------------------
+# Estimate reduced form model
+#-------------------------------------------------------------------------------
+dat_VAR  <- vfci_data[,vars_in_system]
+dat_VAR  <- dat_VAR[apply(dat_VAR,1,function(x) sum(is.na(x)))==0,]
+rf_model <- vars::VAR(dat_VAR,p = nlags)
+
+#-------------------------------------------------------------------------------
 # Calculate posterior
 #-------------------------------------------------------------------------------
 
@@ -9,7 +16,7 @@ optout         = TvvDir(input_in_var,
     vars       = vars,
     logseries  = log_trans,
     nStep      = irf_steps, 
-    nLags      = nlags_calibration,
+    nLags      = nlags,
     lcA0       = lcA0,            # no restrictions
     lmdblock   = NULL,            # default option: all variances change in all periods
     strTsigbrk = regime_dates,
@@ -23,6 +30,8 @@ optout         = TvvDir(input_in_var,
 
 n_var          <<- length(vars)             # number of variables
 n_reg          <<- length(regime_dates) + 1 # number of variance regimes 
+
+#############################################################
 
 # Save output
 save(optout,file = 'output/gmode.Rdata')
@@ -50,6 +59,17 @@ if (my_choice == 'gaussian'){
                         dscore = TRUE, # if TRUE, save the log inverse gamma densities, which is useful for MDD calculation
                         drawe = TRUE   # If TRUE, save the structural residuals
     )
+    
+    ## COMPUTE MARGINAL DATA DENSITY 
+    ## Outputs are mout[1]: uncorrected mdd
+   	##			   mout[2]: corrected mdd using the log density weights in efac
+   	##			   cv     : covariance matrix
+   	
+    mdd_output <- get_mdd(t(mcmc_output$xout), mcmc_output$lhout,
+    					efac  = mcmc_output$dsout,      # density component from non-normal adj parameters
+    					trunc = 0.95)
+    						    
+    
 } else if (my_choice == 't'){
     
     df = 2.51928019                    # For VFCI with 10,000 draws
@@ -68,6 +88,12 @@ if (my_choice == 'gaussian'){
                         dscore = TRUE,      # if TRUE, save the log inverse gamma densities, which is useful for MDD calculation
                         drawe = TRUE        # if TRUE, save the structural residuals
     )
-} 
+    
+    ## COMPUTE MARGINAL DATA DENSITY
+    mdd_output <- get_mdd(t(mcmc_output$xout), mcmc_output$lhout,
+    					efac  = mcmc_output$dsout,      # density component from non-normal adj parameters
+    					trunc = 0.95)
+      
+}
 
 #-------------------------------------------------------------------------------

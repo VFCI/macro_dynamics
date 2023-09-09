@@ -5,7 +5,7 @@
 #Impact of the FF shock on all variables
 if (type == "baseline") {
 iv_var_ff <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(vars_in_system_baseline)],vfci_data_mp[mp_instrument]), 
-                         p = 3, 
+                         p = nlags, 
                          horizon = 20,
                          freq = 'quarter',
                          structure = 'IV',
@@ -13,7 +13,7 @@ iv_var_ff <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(va
                          instrumented = "fedfunds")
 } else if (type == "stationary") {
     iv_var_ff <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(vars_in_system_stationary)],vfci_data_mp[mp_instrument]), 
-                                p = 3, 
+                                p = nlags, 
                                 horizon = 20,
                                 freq = 'quarter',
                                 structure = 'IV',
@@ -21,7 +21,7 @@ iv_var_ff <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(va
                                 instrumented = "fedfunds")
 } else if (type == "vfci_lev") {
   iv_var_ff <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(vars_in_system_vfci_lev)],vfci_data_mp[mp_instrument]), 
-                              p = 3, 
+                              p = nlags, 
                               horizon = 20,
                               freq = 'quarter',
                               structure = 'IV',
@@ -45,7 +45,7 @@ df_irf_ff$response.upper.68 <- df_irf_ff_68$response.upper
 #Impact of the VFCI shock on all variables
 if (type == "baseline") {
 iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_in_system_baseline)],vfci_data[vfci_instrument]), 
-                         p = 3, 
+                         p = nlags, 
                          horizon = 20,
                          freq = 'quarter',
                          structure = 'IV',
@@ -53,7 +53,7 @@ iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_i
                          instrumented = "vfci")
 } else if (type == "stationary") {
   iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_in_system_stationary)],vfci_data[vfci_instrument]), 
-                                p = 3, 
+                                p = nlags, 
                                 horizon = 20,
                                 freq = 'quarter',
                                 structure = 'IV',
@@ -61,7 +61,7 @@ iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_i
                                 instrumented = "vfci")
 } else if (type == "vfci_lev") {
   iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_in_system_vfci_lev)],vfci_data[vfci_instrument]), 
-                                p = 3, 
+                                p = nlags, 
                                 horizon = 20,
                                 freq = 'quarter',
                                 structure = 'IV',
@@ -84,7 +84,7 @@ df_irf_vfci$response.upper.68 <- df_irf_vfci_68$response.upper
 #Impact of the growth shock on all variables
 if (type == "baseline") {
 iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_stationary)],vfci_data_y[y_instrument]), 
-                             p = 2, 
+                             p = nlags, 
                              horizon = 20,
                              freq = 'quarter',
                              structure = 'IV',
@@ -92,7 +92,7 @@ iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_
                              instrumented = "ygr")
 } else if (type == "stationary") {
   iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_stationary)],vfci_data_y[y_instrument]), 
-                             p = 2, 
+                             p = nlags, 
                              horizon = 20,
                              freq = 'quarter',
                              structure = 'IV',
@@ -100,7 +100,7 @@ iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_
                              instrumented = "ygr")
 } else if (type == "vfci_lev") {
   iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_vfci_lev_stationary)],vfci_data_y[y_instrument]), 
-                             p = 2, 
+                             p = nlags, 
                              horizon = 20,
                              freq = 'quarter',
                              structure = 'IV',
@@ -156,7 +156,7 @@ shock_ff <- vfci_data_mp[, mp_instrument]
 shock_ff <- as.data.frame(shock_ff)
 # Estimate linear model
 results_lin_iv_ff <- lpirfs::lp_lin_iv(endog_data,
-                              lags_endog_lin = 4,
+                              lags_endog_lin = nlags,
                               shock = shock_ff,
                               trend = 2,
                               confint = 1.65,
@@ -165,7 +165,7 @@ results_lin_iv_ff <- lpirfs::lp_lin_iv(endog_data,
                               hor = 20)
 
 results_lin_iv_ff.68 <- lpirfs::lp_lin_iv(endog_data,
-                                 lags_endog_lin = 4,
+                                 lags_endog_lin = nlags,
                                  shock = shock_ff,
                                  trend = 2,
                                  confint = 1,
@@ -186,9 +186,10 @@ endog_data <- vfci_data[, vars_vfci_last_baseline]
 }
 shock_vfci <- vfci_data[, vfci_instrument]
 shock_vfci <- as.data.frame(shock_vfci)
+
 # Estimate linear model
 results_lin_iv_vfci <- lpirfs::lp_lin_iv(endog_data,
-                              lags_endog_lin = 4,
+                              lags_endog_lin = nlags,
                               shock = shock_vfci,
                               trend = 2,
                               confint = 1.65,
@@ -197,7 +198,7 @@ results_lin_iv_vfci <- lpirfs::lp_lin_iv(endog_data,
                               hor = 20)
 
 results_lin_iv_vfci.68 <- lpirfs::lp_lin_iv(endog_data,
-                                   lags_endog_lin = 4,
+                                   lags_endog_lin = nlags,
                                    shock = shock_vfci,
                                    trend = 2,
                                    confint = 1,
@@ -220,7 +221,7 @@ shock_y <- vfci_data[, y_instrument]
 shock_y <- as.data.frame(shock_y)
 # Estimate linear model
 results_lin_iv_y <- lpirfs::lp_lin_iv(endog_data2,
-                            lags_endog_lin = 4,
+                            lags_endog_lin = nlags,
                             shock = shock_y,
                             trend = 2,
                             confint = 1.65,
@@ -229,7 +230,7 @@ results_lin_iv_y <- lpirfs::lp_lin_iv(endog_data2,
                             hor = 20)
 
 results_lin_iv_y.68 <- lpirfs::lp_lin_iv(endog_data2,
-                                lags_endog_lin = 4,
+                                lags_endog_lin = nlags,
                                 shock = shock_y,
                                 trend = 2,
                                 confint = 1,
@@ -255,19 +256,19 @@ if (plot_within_this_code == 1) {
 # VFCI ordered last
 if (type == "baseline") {
 chol_var_vfci <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(vars_vfci_last_baseline)]), 
-                              p = 3, 
+                              p = nlags, 
                               horizon = 19,
                               freq = 'quarter',
                               structure = 'short')
 } else if (type == "stationary") {
   chol_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_vfci_last_stationary)]), 
-                                  p = 3, 
+                                  p = nlags, 
                                   horizon = 19,
                                   freq = 'quarter',
                                   structure = 'short')
 } else if (type == "vfci_lev") {
   chol_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_vfci_last_vfci_lev)]), 
-                                  p = 3, 
+                                  p = nlags, 
                                   horizon = 19,
                                   freq = 'quarter',
                                   structure = 'short')

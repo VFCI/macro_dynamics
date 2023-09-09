@@ -19,7 +19,7 @@ vars_vfci_last_vfci_lev_stationary <- c('ygr','infl_pce','fedfunds','vfci_lev')
 # 2. Specify relevant instruments
 #-------------------------------------------------------------------------------
 
-y_instrument    <- c("y_shock")
+y_instrument    <- c("std_y_shock")
 
 mp_instrument   <- c("std_mp_shock_int_rr_ns")
 

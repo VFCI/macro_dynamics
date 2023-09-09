@@ -9,21 +9,21 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.005,0.001))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.2),c(-0.05,0.15))
-
+  
 } else if (type == "regimes") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
   yaxis_vfci_shock  <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.007,0.001))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.3),c(-0.05,0.3))
-
+  
 } else if (type == "normal") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(-0.02,0.002),c(-0.01,0.01),c(-0.05,0.3),c(-0.01,0.001))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.3),c(-0.05,0.25))
-
+  
 } else if (type == "stationary") {
   vars_in_system <- c('ygr','infl_pce','vfci','fedfunds') 
   var_names      <- c("GDP Growth", "PCE Inflation", "VFCI", "Fed Funds")
@@ -73,6 +73,34 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
   yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
   
+} else if (type == "horserace_gz_tedr") {
+  vars_in_system <- c('lgdp', 'lpce', 'vfci', 'gz', 'tedr', 'fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "GZ", "TEDR", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "GZ shock", "TEDR shock", "Fed Funds shock")
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.04,0.4),c(-0.005,0.001))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.04,0.1),c(-0.015,0.15)) 
+  
+} else if (type == "horserace_no_vfci_yes_gz") {
+  vars_in_system <- c('lgdp', 'lpce', 'gz', 'fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "GZ", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "GZ shock", "Fed Funds shock")
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.005,0.001))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.015,0.15)) 
+  
+} else if (type == "horserace_no_vfci_yes_tedr") {
+  vars_in_system <- c('lgdp', 'lpce', 'tedr', 'fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "TEDR", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "TEDR shock", "Fed Funds shock")
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.005,0.001))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.015,0.15)) 
+  
+} else if (type == "horserace_no_vfci_yes_gz_tedr") {
+  vars_in_system <- c('lgdp', 'lpce', 'gz', 'tedr', 'fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "GZ",  "TEDR", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock","GZ shock", "TEDR shock", "Fed Funds shock")
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.04,0.4),c(-0.005,0.001))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.04,0.1),c(-0.015,0.15)) 
+  
 }
 
 input_in_var <- as.data.frame(vfci_data[, c("date", vars_in_system)])
@@ -114,13 +142,13 @@ if (type == "pre_crisis") {
   regime_dates          <<- as.Date(c('1979-10-01','1983-01-01','1990-01-01'))
 }
 
-if (type == "horserace_ecy" | type == "horserace_gz" | type == "horserace_nfci") {
+if (type == "horserace_ecy" | type == "horserace_gz" | type == "horserace_no_vfci_yes_gz" | type == "horserace_nfci") {
   startdate_calibration <<- as.Date('1973-04-01')      # Common starting date for horseraces depending on data availability
   enddate_calibration   <<- as.Date('2022-07-01')
   regime_dates          <<- as.Date(c('1979-10-01','1983-01-01','1990-01-01','2008-01-01','2011-01-01', '2020-01-01'))
 }
 
-if (type == "horserace_tedr") {
+if (type == "horserace_tedr" | type == "horserace_gz_tedr" | type == "horserace_no_vfci_yes_tedr"| type ==  "horserace_no_vfci_yes_gz_tedr") {
   startdate_calibration <<- as.Date('1973-04-01')
   enddate_calibration   <<- as.Date('2021-10-01')      # Series discontinued from 2022Q1
   regime_dates          <<- as.Date(c('1979-10-01','1983-01-01','1990-01-01','2008-01-01','2011-01-01', '2020-01-01'))
@@ -139,7 +167,7 @@ nlags_calibration     <- 4
 
 mn_tight_calib <- 3
 mn_decay_calib <- 0.5
-if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci") {
+if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci" | type == "horserace_no_vfci_yes_gz" | type == "horserace_gz_tedr" | type == "horserace_no_vfci_yes_tedr"| type ==  "horserace_no_vfci_yes_gz_tedr") {
   mn_tight_calib <- 0.5     # with second financial variable
 }  
 
