@@ -21,7 +21,7 @@ vars_vfci_last_vfci_lev_stationary <- c('ygr','infl_pce','fedfunds','vfci_lev')
 #Estimation
 
 #### Seems to work only with stationary data
-##Help on this: https://github.com/FK83/bvarsv/issues/2
+##https://github.com/FK83/bvarsv/issues/2
 
 b <- vfci_data[vars_in_system_stationary]
 z <- b %>% mutate(ygr = ygr/100, infl_pce = infl_pce/100)
@@ -56,12 +56,4 @@ mtext("VFCI Response to Inflation Shock", side = 3, line = 1, cex = 1)
 impulse.responses(bv, impulse.variable = 3, response.variable = 3)
 mtext("VFCI Response to VFCI Shock", side = 3, line = 1, cex = 1)
 
-#https://cran.r-project.org/web/packages/bvarsv/bvarsv.pdf
-
-#to see the content of the BVAR function (just type the function and press enter)
-bvar.sc.tvp
-impulse.response
-
-#to see the contents of the IRF package (to get 68th and 95th percentiles)
-ls(bv)
-
+#-------------------------------------------------------------------------------
