@@ -1,6 +1,5 @@
 rm(list=ls())
 # Preliminary ------------------------------------------------------------------
-path<-setwd("/Users/Spicey51/Desktop/macro_dynamics-main")
 path <- getwd()
 setwd(path)
 

@@ -20,12 +20,8 @@ vars_vfci_last_vfci_lev_stationary <- c('ygr','infl_pce','fedfunds','vfci_lev')
 #-------------------------------------------------------------------------------
 #Estimation
 
-#### The following works only with stationary data???
+#### Seems to work only with stationary data
 ##Help on this: https://github.com/FK83/bvarsv/issues/2
-
-# a <- vfci_data[vars_vfci_last_baseline]
-# x <- a %>% mutate(lgdp = lgdp/100, lpce = lpce/100)
-# y <- a %>% mutate(fedfunds = fedfunds*100, vfci=vfci*10)
 
 b <- vfci_data[vars_in_system_stationary]
 z <- b %>% mutate(ygr = ygr/100, infl_pce = infl_pce/100)
