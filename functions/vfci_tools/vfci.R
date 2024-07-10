@@ -3,21 +3,12 @@ get_pc <- function(
     var_names,
     date_begin = "1962 Q1",
     date_end = "2022 Q3",
-    cor = TRUE,
-    scores = TRUE,
     center = TRUE,
     scale. = TRUE,
-    match_stata = TRUE,
     ...
 ) {
   prcomp_tidy <- function(x,...){ 
-    #preferred method is use prcomp, using princomp to match stata
-    if (match_stata){
-      princomp(x, cor = cor ,scores = scores, ...) #covmat = MASS::cov.rob(x)  
-    }
-    else{
-      prcomp(x, center = center, scale. = scale., ...) 
-    }
+    prcomp(x, center = center, scale. = scale., ...)
   }
   pcs <- data %>%
     tsibble::as_tsibble() %>% 
@@ -27,7 +18,7 @@ get_pc <- function(
     prcomp_tidy()
 }
 
-get_vfci <- function(data,y,x,het=x,prcomp=TRUE,n_prcomp = 4, date_begin="1962 Q1", date_end="2022 Q3",match_stata=TRUE, ..., gls_opt = list()) {
+get_vfci <- function(data,y,x,het=x,prcomp=TRUE,n_prcomp = 4, date_begin="1962 Q1", date_end="2022 Q3", ...) {
   Call <- match.call()
   optarg <- list(...)
   data <- data %>% 
@@ -36,23 +27,18 @@ get_vfci <- function(data,y,x,het=x,prcomp=TRUE,n_prcomp = 4, date_begin="1962 Q
     tibble::as_tibble()
   
   if (prcomp) {
-    pca <- get_pc(data,x,match_stata=match_stata,...)
-    if (match_stata){
-      pcs <- pca$scores # time series of principal components in princomp
-    }
-    else {
-      pcs <- pca$x # time series of principal components in princomp  
-    }
-    
+    pca <- get_pc(data,x,...)
+    pcs <- pca$x
+
     colnames(pcs) <- paste0("pc", 1:ncol(pcs))
     data_pcs <- dplyr::bind_cols(data,tibble::as_tibble(pcs),.name_repair = c("minimal"))
     x_pcs <- paste0("pc", 1:n_prcomp)
-    h <- hetreg(data_pcs,y,x_pcs, ..., gls_opt = gls_opt)
+    h <- hetreg(data_pcs,y,x_pcs, ...)
     h$pc <- pca
     h$pc_ts <- data_pcs %>% dplyr::select(dplyr::all_of(colnames(pcs)) )
   }
   else {
-    h <- hetreg(data,y,x,het, ..., gls_opt = gls_opt)
+    h <- hetreg(data,y,x,het, ...)
   }
   
   # # mean equation

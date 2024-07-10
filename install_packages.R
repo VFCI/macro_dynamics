@@ -11,6 +11,8 @@ for (x in package_list){
     
     library(x,character.only=TRUE)
 }
+# install.packages("jsonlite", repos = c("https://jeroen.r-universe.dev", "https://cloud.r-project.org"))
+# devtools::install_github("paulponcet/tribe")
 
 renv::restore(prompt=FALSE)
 renv::install("https://github.com/jrnold/stataXml/")
