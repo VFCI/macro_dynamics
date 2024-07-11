@@ -19,7 +19,10 @@ hetreg <- function(data,y,x,het=x, ...) {
     glue::glue_collapse(glue::glue("nlme::varExp(form = ~ {het})"), ",\n"),
     ")"
   )))
-  frm <- formula(paste(mean_eq, collapse = " "))
-  h <- nlme::gls(frm,data=data, weights=weights, ...)
+
+  frm <- stats::formula(paste(mean_eq, collapse = " "))
+  h <- nlme::gls(frm, data = data, weights = weights, ...)
+  h$call$hetreg <- call
+  return(h)
 }
 

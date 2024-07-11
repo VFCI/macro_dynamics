@@ -15,5 +15,5 @@ for (x in package_list){
 # devtools::install_github("paulponcet/tribe")
 
 renv::restore(prompt=FALSE)
-renv::install("https://github.com/jrnold/stataXml/")
+renv::install("https://github.com/jrnold/stataXml/", prompt=FALSE)
 

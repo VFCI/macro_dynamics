@@ -8,11 +8,15 @@ date_end <- "2022 Q3"
 
 ## Table. Factor loadings -------------------------------------
 loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
+
+cumvar <- cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
 table_data <- t(rbind(
-  loadings$importance["Cumulative Proportion",1:4, drop= FALSE],
-  loadings$rotation[,1:4]
+  cumvar[1:4],
+  loadings$loadings[,1:4]
 ))
 dimnames(table_data)[[2]][[1]]<-"Cumul. Var."
+
+loadings$loadings
 
 
 ## Table. Regression of FCIs on PCs -------------------------------------
@@ -184,3 +188,4 @@ vtable::st(VAR_fred_vars,
            out = "latex"
            # out = "viewer"
 )
+

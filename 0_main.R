@@ -91,3 +91,19 @@ for (i in vol_bvar_robustness_b) {
   source('1_vol_bvar_estimation.R')
   source('1_vol_bvar_output.R')
 }
+
+# Other robustness checks (not in Appendix) ------------------------------------
+#Robustness
+# 12. Remove VFCI and add GZ
+# 13. Remove VFCI and add TED
+# 14. Remove VFCI and add both GZ and TED
+# 15. Add both GZ and TED
+
+vol_bvar_robustness_c <- c("horserace_no_vfci_yes_gz","horserace_no_vfci_yes_tedr", "horserace_no_vfci_yes_gz_tedr","horserace_gz_tedr")
+for (i in vol_bvar_robustness_c) {
+  type = i
+  source('1_vol_bvar_calibration.R')
+  source('1_vol_bvar_estimation.R')
+  source('1_vol_bvar_output.R')
+}
+
