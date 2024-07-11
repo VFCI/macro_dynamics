@@ -15,9 +15,6 @@ base::load("variables.RData")
 vfci_data <- variables
 vfci_data$date = seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
 
-#Set lags for all models
-nlags    <- 4
-
 # Main results -----------------------------------------------------------------
 ## Baseline results ------------------------------------------------------------
 type <- "baseline"
@@ -31,11 +28,6 @@ source('1_vol_bvar_output.R')
 source('2_svariv_lpiv_chol_sn_calibration.R')
 source('2_svariv_lpiv_chol_sn_estimation.R')
 source('2_svariv_lpiv_chol_sn_output.R')
-
-### Export Residuals when running baseline  ------------------------------------
-if(type  == "baseline"){
-	source("3_create_residual_mat.R")
-}
 
 ### Panel: All models ----------------------------------------------------------
 ff_y <- c("ff", "y")
@@ -82,9 +74,9 @@ for (i in five_model_robustness) {
 # 8. Horserace with TEDR
 # 9. Horserace with NFCI
 # 10. 100,000 draws in the MCMC chain
-# 11. 1M draws in the MCMC chain
+# 11. 1 million draws in the MCMC chain
 
-vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k") #1M  
+vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k", "1M")  
 for (i in vol_bvar_robustness_a) {
   type = i
   source('1_vol_bvar_calibration.R')
@@ -114,3 +106,4 @@ for (i in vol_bvar_robustness_c) {
   source('1_vol_bvar_estimation.R')
   source('1_vol_bvar_output.R')
 }
+

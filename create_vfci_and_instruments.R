@@ -359,8 +359,9 @@ vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp
 vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
   rename(vfci_ea = vfci,mu_ea=mu)
 
+
 vfci_mv <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>%
-  rename(vfci_ind = vfci,mu_ind=mu)
+                         rename(vfci_ind = vfci,mu_ind=mu)
 
 # merge, tidy NA
 variables <- purrr::reduce(list(variables, results$fgr1.gdpc1$ts), dplyr::inner_join, by = "qtr")

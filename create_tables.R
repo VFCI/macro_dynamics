@@ -8,6 +8,7 @@ date_end <- "2022 Q3"
 
 ## Table. Factor loadings -------------------------------------
 loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
+
 cumvar <- cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
 table_data <- t(rbind(
   cumvar[1:4],
@@ -16,6 +17,7 @@ table_data <- t(rbind(
 dimnames(table_data)[[2]][[1]]<-"Cumul. Var."
 
 loadings$loadings
+
 
 ## Table. Regression of FCIs on PCs -------------------------------------
 library(modelsummary)
