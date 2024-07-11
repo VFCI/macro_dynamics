@@ -13,5 +13,5 @@ for (x in package_list){
 }
 
 renv::restore(prompt=FALSE)
-renv::install("https://github.com/jrnold/stataXml/")
+renv::install("https://github.com/jrnold/stataXml/", prompt=FALSE)
 
