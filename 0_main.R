@@ -1,14 +1,14 @@
-rm(list=ls())
 # Preliminary ------------------------------------------------------------------
 path <- getwd()
 setwd(path)
 
 ## Load functions and packages
 source('load_functions.R')
-load_functions() 
 
-#source('create_vfci_and_instruments.R')
-#source('create_figures.R')
+load_functions() 
+source('create_vfci_and_instruments.R')
+source('create_figures.R')
+source('create_tables.R')
 
 # Load Data --------------------------------------------------------------------
 base::load("variables.RData")
@@ -102,12 +102,12 @@ for (i in vol_bvar_robustness_b) {
 
 # Other robustness checks (not in Appendix) ------------------------------------
 #Robustness
-# 12. Add both GZ and TED
-# 13. Remove VFCI and add GZ
-# 14. Remove VFCI and add TED
-# 15. Remove VFCI and add both GZ and TED
+# 12. Remove VFCI and add GZ
+# 13. Remove VFCI and add TED
+# 14. Remove VFCI and add both GZ and TED
+# 15. Add both GZ and TED
 
-vol_bvar_robustness_c <- c("horserace_gz_tedr", "horserace_no_vfci_yes_gz","horserace_no_vfci_yes_tedr", "horserace_no_vfci_yes_gz_tedr")  
+vol_bvar_robustness_c <- c("horserace_no_vfci_yes_gz","horserace_no_vfci_yes_tedr", "horserace_no_vfci_yes_gz_tedr","horserace_gz_tedr")
 for (i in vol_bvar_robustness_c) {
   type = i
   source('1_vol_bvar_calibration.R')

@@ -14,11 +14,16 @@ date_begin <- "1970 Q1"
 date_end <- "2022 Q3"
 
 variables_fig1 <- variables %>%
-  dplyr::select(yr,qtr, nfci, gsfci, vixcls) %>%
+  dplyr::select(yr,qtr, nfci,gsfci,vixcls) %>%
   tsibble::as_tsibble() %>% 
-  tsibble::filter_index(date_begin ~ date_end)
+  tsibble::filter_index(date_begin ~ date_end) 
 
-p <- ggplot(variables_fig1, aes(qtr)) +
+#variables_fig1$vfci_new <- 0
+
+tibble::add_column(variables_fig1, vfci_new = (variables_fig1 %>%  select(yr,qtr, nfci,gsfci,vixcls)) )
+
+
+p <- ggplot(variables_fig1, aes(qtr)) + 
   geom_line(aes(y=scale(nfci),colour="NFCI"),na.rm=FALSE) +
   geom_line(aes(y=scale(gsfci),colour="GSFCI"),na.rm=FALSE) +
   geom_line(aes(y=scale(vixcls),colour="VIX"),na.rm=FALSE) +
@@ -29,7 +34,7 @@ p <- ggplot(variables_fig1, aes(qtr)) +
   theme_classic() +
   theme(
     legend.title=element_blank(),
-    legend.position = c(0.5,0.95),
+    legend.position = "bottom",
     legend.direction="horizontal",
     axis.title.y=element_blank()
   ) + 
@@ -75,10 +80,10 @@ variables_fig3 <- variables %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig3), aes(x=vfci,y=mu)) +
-  geom_point(aes(color="Conditional mean in VFCI regression"),shape="diamond",size=3) +
-  geom_smooth(aes(color="Fitted values"),method=lm, se=FALSE,linewidth=0.5) +
-  xlab("Conditional Mean of GDP Growth") +
-  ylab('Conditional Volatility of GDP Growth (log)')  +
+  geom_point(aes(color="Fitted values"),shape="diamond",size=3) +
+  geom_smooth(aes(color="OLS line"),method=lm, se=FALSE,linewidth=0.5) +
+  ylab("Conditional Mean of GDP Growth") +
+  xlab('Conditional Volatility of GDP Growth (log)')  +
   theme_classic() +
   theme(
     panel.border = element_rect(colour = "black", fill=NA, linewidth=0.5)
@@ -95,7 +100,7 @@ p <- ggplot(as.data.frame(variables_fig3), aes(x=vfci,y=mu)) +
     legend.title=element_blank(),
     legend.position = c(0.4,0.1),
     legend.direction="horizontal"
-  )
+  ) 
 p %>% print
 
 

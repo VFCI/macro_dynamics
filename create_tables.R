@@ -7,17 +7,13 @@ date_end <- "2022 Q3"
 # Tables ------------------------------------------------------------------
 
 ## Table. Factor loadings -------------------------------------
-match_stata <- TRUE
-if (match_stata){
-  
-} else {
-  loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
-  table_data <- t(rbind(
-    loadings$importance["Cumulative Proportion",1:4, drop= FALSE],
-    loadings$rotation[,1:4]
-  ))
-  dimnames(table_data)[[2]][[1]]<-"Cumul. Var."
-}
+loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
+table_data <- t(rbind(
+  loadings$importance["Cumulative Proportion",1:4, drop= FALSE],
+  loadings$rotation[,1:4]
+))
+dimnames(table_data)[[2]][[1]]<-"Cumul. Var."
+
 
 ## Table. Regression of FCIs on PCs -------------------------------------
 library(modelsummary)
@@ -44,7 +40,7 @@ Map(\(out) modelsummary::modelsummary(models,
                                       coef_omit= '(Intercept)',
                                       caption = "\\textbf{Association between FCIs and PCs} \\label{tab:FCIregressions}",
                                       output = out
-), list("gt",here::here("output","fcis_on_pcs_new.tex")) )
+), list("gt",here::here("output","tables","fcis_on_pcs_new.tex")) )
 
 
 ## Table. Regression of FYQ and FCQ on PCs ---------------------------------
@@ -78,7 +74,7 @@ Map(\(out) modelsummary::modelsummary(models,
                                       coef_omit= '(Intercept)',
                                       caption = "\\textbf{Heteroskedasticity Linear Regression of GDP and PCE Growth on PCs} \\label{tab:reg2}",
                                       output = out
-), list("gt",here::here("output","significance_of_pcs_1962_2022_new.tex")) )
+), list("gt",here::here("output","tables","significance_of_pcs_1962_2022_new.tex")) )
 
 #                        #statistic = "({p.value})", #statistic = "[{statistic}]",
 #notes = "p-values in parentheses",
@@ -145,7 +141,7 @@ gm <-tibble::tribble(
 
 Map(\(yvar) 
     Map(\(out) 
-        models %>% pivot_wider %>% 
+        models %>% pivot_wider(values_fn = list) %>% 
           pull(toupper(yvar)) %>% 
           unlist(.,recursive=FALSE) %>% 
           # dvnames %>%
@@ -163,14 +159,14 @@ Map(\(yvar)
                                   The {yvar} ", captions(tolower(yvar)), "\\label{{tab:{tolower(yvar)}_regs}}."),
                        output = out
           ),
-        list("gt",here::here("output","reg_gz_new.tex"))), toupper(y))
+        list("gt",here::here("output","tables","reg_gz_new.tex"))), toupper(y))
 
 ## Table. VAR variables -----------------------------------
 VAR_date_begin = "1962 Q1"
 VAR_date_end = "2022 Q3"
 
 VAR_fred_vars <- variables %>%
-  select(fedfunds, log.gdpc1, log.pcepilfe, qtr) %>% 
+  select(fedfunds, lgdp, lpce, qtr) %>% 
   filter(between(as.Date(qtr), as.Date(as.yearqtr(VAR_date_begin)), as.Date(as.yearqtr(VAR_date_end)))) 
 
 vtable::st(VAR_fred_vars,
