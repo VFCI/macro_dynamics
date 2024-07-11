@@ -1,0 +1,29 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.1, ** p < 0.05, *** p < 0.01},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+hline{10}={1,2,3,4}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& NFCI & GSFCI & VIX \\ \midrule %% TinyTableHeader
+PC1      & 0.152***  & 0.330***  & 3.735***  \\
+& (0.023)   & (0.065)   & (0.208)   \\
+PC2      & -0.600*** & -1.067*** & -2.058*** \\
+& (0.023)   & (0.107)   & (0.442)   \\
+PC3      & 0.296***  & 1.717***  & 0.816     \\
+& (0.033)   & (0.113)   & (0.568)   \\
+PC4      & -0.000    & -0.921*** & 2.915***  \\
+& (0.038)   & (0.109)   & (0.395)   \\
+Num.Obs. & 207       & 157       & 131       \\
+R2       & 0.808     & 0.734     & 0.798     \\
+\bottomrule
+\end{talltblr}
+\end{table}

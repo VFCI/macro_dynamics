@@ -44,7 +44,7 @@ Map(\(out) modelsummary::modelsummary(models,
                                       coef_omit= '(Intercept)',
                                       caption = "\\textbf{Association between FCIs and PCs} \\label{tab:FCIregressions}",
                                       output = out
-), list("gt",here::here("output","tables","fcis_on_pcs_new.tex")) )
+), list("gt",here::here("output","baseline","tables","fcis_on_pcs_new.tex")) )
 
 
 ## Table. Regression of FYQ and FCQ on PCs ---------------------------------
@@ -78,7 +78,7 @@ Map(\(out) modelsummary::modelsummary(models,
                                       coef_omit= '(Intercept)',
                                       caption = "\\textbf{Heteroskedasticity Linear Regression of GDP and PCE Growth on PCs} \\label{tab:reg2}",
                                       output = out
-), list("gt",here::here("output","tables","significance_of_pcs_1962_2022_new.tex")) )
+), list("gt",here::here("output","baseline","tables","significance_of_pcs_1962_2022_new.tex")) )
 
 #                        #statistic = "({p.value})", #statistic = "[{statistic}]",
 #notes = "p-values in parentheses",
@@ -163,7 +163,7 @@ Map(\(yvar)
                                   The {yvar} ", captions(tolower(yvar)), "\\label{{tab:{tolower(yvar)}_regs}}."),
                        output = out
           ),
-        list("gt",here::here("output","tables","reg_gz_new.tex"))), toupper(y))
+        list("gt",here::here("output","baseline","tables","reg_gz_new.tex"))), toupper(y))
 
 ## Table. VAR variables -----------------------------------
 VAR_date_begin = "1962 Q1"
@@ -181,7 +181,7 @@ vtable::st(VAR_fred_vars,
            title = "Title",
            note = "\\textbf{Descriptive Statistics for the Macro-Financial Variables:} The VFCI is constructed in the previous section, the remaining data is from the FRED database of the Federal Reserve Bank of St Louis.",
            anchor = "sumstats_for_var",
-           file = here::here("output","tables","table7.tex"),
+           file = here::here("output","baseline","tables","table7.tex"),
            align = 'p{.3\\textwidth}ccccccc',
            fit.page = '\\textwidth',
            note.align = 'p{.3\\textwidth}ccccccc',

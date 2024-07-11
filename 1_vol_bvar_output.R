@@ -15,7 +15,7 @@ if (avg_regime == 1 & type == "baseline") {
     #Export to TeX
     library("xtable")
     tab<-xtable(table_rel_variance,  align=c("l","c","c","c","c","c","c","c"))
-    print(tab,file="output/baseline/table_rel_var.tex",append=F)
+    print(tab,file="output/baseline/tables/table_rel_var.tex",append=F)
 }
 
 #-------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ if (avg_regime == 1) {
       color = c(0,0.6,0), ##Color of IRFs
       nsteps = irf_steps,
       varnames = var_names,
-      filename = paste('output/appendix/irplot_all_shocks','_reg_',r,sep=''),
+      filename = paste('output/appendix/figures/irplot_all_shocks','_reg_',r,sep=''),
       format = 'pdf',#'r_plot',
       width = 9, height = 7,savedata = FALSE,newplot = TRUE)
     
@@ -207,7 +207,7 @@ if (avg_regime == 1) {
       color = c(0,0.6,0), ##Color of IRFs
       nsteps = irf_steps,
       varnames = var_names,
-      filename = paste('output/appendix/irplot_all_shocks','_reg',r,sep=''),
+      filename = paste('output/appendix/figures/irplot_all_shocks','_reg',r,sep=''),
       width = 9, height = 7,savedata = FALSE,newplot = TRUE)
     
      print(r)

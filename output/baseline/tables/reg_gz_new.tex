@@ -1,0 +1,35 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.1, ** p < 0.05, *** p < 0.01},
+note{ }={\$t\$ statistics in parentheses},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+hline{13}={1,2,3,4,5,6}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) & (3) & (4) & (5) \\ \midrule %% TinyTableHeader
+& ECY      & ECY      & ECY      & ECY      & ECY      \\
+Lag ECY                     & 0.976*** & 0.927*** & 0.900*** & 0.942*** & 0.964*** \\
+& (51.26)  & (48.58)  & (37.26)  & (30.52)  & (36.57)  \\
+VFCI                        & 0.799*** &          &          &          & 0.909*** \\
+& (6.16)   &          &          &          & (4.45)   \\
+NFCI                        &          & 0.255*** &          &          & -0.112   \\
+&          & (3.92)   &          &          & (-0.69)  \\
+GSFCI                       &          &          & 0.040    &          & 0.072*   \\
+&          &          & (1.60)   &          & (1.73)   \\
+VIXCLS                      &          &          &          & 0.030*** & 0.000    \\
+&          &          &          & (4.16)   & (-0.05)  \\
+N                           & 242      & 207      & 157      & 131      & 129      \\
+\$R\textasciicircum{}2\$ & 0.96     & 0.95     & 0.93     & 0.92     & 0.94     \\
+\bottomrule
+\end{talltblr}
+\end{table}

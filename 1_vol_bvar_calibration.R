@@ -204,9 +204,9 @@ ncore = 1
 # Output file
 filename = paste0("output/mcmc_out_",type)
 if (type == "baseline") {
-  filename_overleaf = paste0("output/baseline/mcmc_out_",type)
+  filename_overleaf = paste0("output/baseline/figures/mcmc_out_",type)
 } else {
-  filename_overleaf = paste0("output/appendix/mcmc_out_",type)
+  filename_overleaf = paste0("output/appendix/figures/mcmc_out_",type)
 }
 
 #-------------------------------------------------------------------------------

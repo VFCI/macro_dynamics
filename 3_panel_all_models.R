@@ -26,8 +26,8 @@ if (vfci_pair == "ff") {
 #      For baseline as well as for robustness
 
 if (vfci_pair == "ff") {
-  col1 <- "MP shock to VFCI"
-  col2 <- "VFCI shock to MP" 
+  col1 <- "Fed Funds shock to VFCI"
+  col2 <- "VFCI shock to Fed Funds" 
   vol_bvar_second_var <- "Fed Funds"
   vol_bvar_type_vfci <- var_names[3]
   GDP_FF_FOR_IV <- "fedfunds"
@@ -77,9 +77,9 @@ export_pdf <- 1                  ##### CONFIG 4 #####
 
 if (export_pdf == 1) {
   if (type == "baseline") {
-    fname <- here::here(paste0("output/baseline/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
+    fname <- here::here(paste0("output/baseline/figures/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
   } else {
-    fname <- here::here(paste0("output/appendix/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
+    fname <- here::here(paste0("output/appendix/figures/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
   }
   if (vfci_pair == "ff") {
       pdf(fname, width = 8, height = 11)

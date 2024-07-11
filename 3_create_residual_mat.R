@@ -125,7 +125,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","bvar_shock_corr",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","bvar_shock_corr",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
@@ -145,7 +145,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","rf_res_corr",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","rf_res_corr",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
@@ -165,7 +165,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","sf_all_models_corr_ff",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_ff",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
@@ -185,7 +185,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","sf_all_models_corr_vfci",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_vfci",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
@@ -206,7 +206,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","sf_all_models_corr_p",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_p",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
@@ -227,7 +227,7 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/","sf_all_models_corr_y",'.pdf', sep = ''))
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_y",'.pdf', sep = ''))
 pdf(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
