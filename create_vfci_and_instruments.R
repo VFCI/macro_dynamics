@@ -1,4 +1,4 @@
-library(dplyr) # for %>% operator
+library(dplyr)
 library(zoo)
 library(xts)
 library(quantmod)
@@ -74,13 +74,33 @@ growth_rate <- function(
   )
   return(gr)
 }
+#' Helper function: compute and name leads and lags
+multilag <- function(x, n = 1:3, type = c("both", "lag", "lead"), .prefix = "", .postfix = "") {
+  type <- match.arg(type)
+  if (type == "lag") {
+    names(n)[n==1] <- paste0(.prefix, "l", .postfix) #first lag is just "l" and not "l1"
+    names(n)[n!=1] <- paste0(.prefix, "l", as.character(n[n!=1]), .postfix)
+    tibble::as_tibble(
+      purrr::map(n, \(lags) dplyr::lag(x, lags))
+    )
+  } else if (type == "lead") {
+    names(n)[n==1] <- paste0(.prefix, "f", .postfix) #first lead is just "f" and not "f1"
+    names(n)[n!=1] <- paste0(.prefix, "f", as.character(n[n!=1]), .postfix)
+    tibble::as_tibble(
+      purrr::map(n, \(leads) dplyr::lead(x, leads))
+    )
+  } else if (type == "both") {
+      lags <- multilag(x, n = n, type = "lag", .prefix = .prefix, .postfix = .postfix) 
+      leads <- multilag(x, n = n, type = "lead", .prefix = .prefix, .postfix = .postfix)
+      dplyr::bind_cols(lags,leads)
+  }
+}
 
 ## Variables derived from FRED data ----------------------------------------
 
 # pick dates, variables
 date_begin <- "1960 Q1"
 date_end <- "2023 Q1"
-
 fred <- fred_raw %>% 
   tsibble::as_tsibble(key = c("symbol")) %>%
   tsibble::group_by_key() %>%
@@ -96,25 +116,12 @@ fred <- tibble::as_tibble(fred)
 units <- "percent"
 fred_var_list <- c("GDPC1", "PCEPILFE", "PCECC96", "CLVMNACSCAB1GQEA19")
 fred <- fred %>%
-  # year-over-year growth rates
   dplyr::mutate(
-    gr4 = dplyr::across(
-      dplyr::all_of(fred_var_list),
-      ~ growth_rate(.x, delta = 4, type = "geometric", units = units)
-    ),
-    # quarterly growth rates
-    gr1 = dplyr::across(
-      dplyr::all_of(fred_var_list),
-      ~ growth_rate(.x, delta = 1, type = "geometric", units = units)
-    ),
     # logs
     log = dplyr::across(
       dplyr::all_of(fred_var_list),
       ~ log(.x)
     ),
-    # forward 1 quarter
-    fgr4 = lead(gr4),
-    fgr1 = lead(gr1),
     # spreads
     gap = 100*(GDPC1 / GDPPOT - 1),
     baa_aaa = BAA10YM - AAA10YM,
@@ -122,7 +129,33 @@ fred <- fred %>%
     # tedr starts 1970Q1, not 1962Q1 like rest of variables
     tedr = ifelse(tsibble::time_in(qtr, . ~ "1985 Q4"), LIOR3M - TB3MS, TEDRATE), 
     es = MED3 - TB3MS,
+    # year-over-year growth rates
+    gr4 = dplyr::across(
+      dplyr::all_of(fred_var_list),
+      ~ growth_rate(.x, delta = 4, type = "geometric", units = units),
+      .unpack = TRUE
+    ),
+    # quarterly growth rates
+    gr1 = dplyr::across(
+      dplyr::all_of(fred_var_list),
+      ~ growth_rate(.x, delta = 1, type = "geometric", units = units),
+      .unpack = TRUE
+    ),
   )
+# leads and lags of growth rates
+
+gr_list <- c("gr1","gr4")
+fred <- purrr::map(
+    gr_list,
+    \(gr) 
+        multilag(
+        fred[[gr]],
+        .postfix = gr
+    )
+  ) %>% 
+  dplyr::bind_cols() %>% 
+  tidyr::unnest(.,cols=colnames(.),names_sep=".") %>% 
+  dplyr::bind_cols(fred,.)
 
 # rearrange, rename, tidy NA
 fred <- tidyr::unnest(fred, cols = everything(), names_sep = ".")
@@ -338,9 +371,12 @@ ciss <- ciss %>%
   dplyr::select(!(date))
 
 # Merge all
-variables <- purrr::reduce(list(fred, yahoo, annual_returns, instruments, gs_fci, gz_ebp_ecy, ciss), dplyr::full_join, by = "qtr")
+variables <- purrr::reduce(
+  list(fred, yahoo, annual_returns, instruments, gs_fci, gz_ebp_ecy, ciss),
+  dplyr::full_join, 
+  by = "qtr"
+)
 
-  
 # VFCI --------------------------------------------------------------------
 
 # financial_vars <- c("gspc_vol","gr4.gspc","t10y3m","tb3smffm","aaa10ym","baa_aaa") # old from stata, wrong
@@ -353,19 +389,49 @@ results <- dep_vars %>%
   purrr::set_names() %>% 
   purrr::map(~get_vfci(variables,.,financial_vars,prcomp=TRUE,n_prcomp = 4,date_begin=date_begin, date_end=date_end))
 
-vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>% 
-  rename(vfci_ind = vfci,mu_ind=mu)
+results$vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>% 
+  rename(vfci_ind = vfci, mu_ind=mu)
 
-vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
-  rename(vfci_ea = vfci,mu_ea=mu)
+results$vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
+  rename(vfci_ea = vfci, mu_ea=mu)
 
+results$vfci_lags <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
+    prcomp=TRUE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  )$ts %>% 
+  rename(vfci_lags = vfci, mu_lags=mu)
 
-vfci_mv <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>%
-                         rename(vfci_ind = vfci,mu_ind=mu)
+results$vfci_lags_in_mean <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
+    het = financial_vars,
+    prcomp=TRUE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  )$ts %>% 
+  rename(vfci_lags_in_mean = vfci, mu_lags_in_mean=mu)
+
+results$vfci_lags_in_vol <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    financial_vars,
+    het = c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
+    prcomp=TRUE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  )$ts %>% 
+  rename(vfci_lags_in_vol = vfci, mu_lags_in_vol=mu)
 
 # merge, tidy NA
 variables <- purrr::reduce(list(variables, results$fgr1.gdpc1$ts), dplyr::inner_join, by = "qtr")
-
 
 # Create instruments ------------------------------------------------------
 
