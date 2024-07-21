@@ -3,27 +3,63 @@
 base::load(file = here::here("variables.RData"))
 date_begin <- "1970 Q1"
 date_end <- "2022 Q3"
-
-# Tables ------------------------------------------------------------------
-
-## Table. Factor loadings -------------------------------------
-loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
-
-cumvar <- cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
-table_data <- t(rbind(
-  cumvar[1:4],
-  loadings$loadings[,1:4]
-))
-dimnames(table_data)[[2]][[1]]<-"Cumul. Var."
-
-loadings$loadings
-
-
-## Table. Regression of FCIs on PCs -------------------------------------
 library(modelsummary)
 library(gt)
 options("modelsummary_format_numeric_latex" = "plain")
 
+# Tables ------------------------------------------------------------------
+
+## Table. Principal Components Loadings -----------------------------------
+loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
+
+cumvar <- 100*cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
+
+table_data <- t(rbind(
+  loadings$rotation[c("annual_ret","gspc_vol","t10y3m","tb3smffm","aaa10ym","baa_aaa"),1:4],
+  cumvar[1:4]
+))
+colnames(table_data)[7]<-"cum_var"
+
+table_data_long <- table_data %>% 
+  tidyr::as_tibble(., rownames = "PC") %>% 
+  rename(
+    "Cred" = aaa10ym,
+    "Ret" = annual_ret,
+    "Def" = baa_aaa,
+    "Cumulative Variance" = cum_var,
+    "Vol" = gspc_vol,
+    "Term" = t10y3m,
+    "Liq" = tb3smffm
+  ) %>% 
+  tidyr::pivot_longer(
+    !PC,
+    names_to = "var",
+    values_to = "value",
+    cols_vary = "slowest"
+  )
+
+### Generate table
+tab <- modelsummary::datasummary(
+  PC ~  mean * value * var,
+  data = table_data_long,
+  fmt = fmt_decimal(2),
+  output = "gt"
+) %>% 
+  rm_stubhead() %>%
+  cols_move_to_end(columns = "Cumulative Variance") %>% 
+  cols_move(
+    columns = c("Vol","Term","Liq","Cred","Def"),
+    after = "Ret"
+    ) %>% 
+  cols_align('center', columns = 2:8) 
+ 
+#tab
+#as_latex(tab)
+
+ 
+
+
+## Table. Regression of FCIs on PCs -------------------------------------
 reg1 <- paste("nfci","~",paste(paste0("pc", 1:4), collapse='+'))
 reg2 <- paste("gsfci","~",paste(paste0("pc", 1:4), collapse='+'))
 reg3 <- paste("vixcls","~",paste(paste0("pc", 1:4), collapse='+'))
@@ -105,6 +141,7 @@ library(tidyr)
 library(tibble)
 library(modelsummary)
 library(stringr)
+library(tribe)
 
 y <- c("gz","ecy") #,"ebp"
 y_lag <- c("lag(gz)","lag(ecy)") #,"lag(ebp)"
@@ -124,7 +161,7 @@ nmod <- (models %>%
            pull(n) + 1) %>% 
   setNames(toupper(y))
 
-library(tribe)
+
 rows <- tribble(~"0",~"1",~"2",~"3",~"4",~"5","","GZ","GZ","GZ","GZ","GZ")
 attr(rows,"position")<-c(0)
 
@@ -157,7 +194,7 @@ Map(\(yvar)
                        stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
                        notes = "$t$ statistics in parentheses",
                        gof_map = gm,
-                       fmt= fmt_statistic("estimate" = 3, "statistic" = 2),
+                       fmt= fmt_statistic("estimate" = 2, "statistic" = 1),
                        coef_omit= '(Intercept)',
                        caption = str_glue("\\textbf{{Association between {yvar} spread and FCIs:}} 
                                   The {yvar} ", captions(tolower(yvar)), "\\label{{tab:{tolower(yvar)}_regs}}."),
