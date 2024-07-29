@@ -14,7 +14,7 @@ fred_raw <- tidyquant::tq_get(
     "FEDFUNDS",
     "ANFCI",
     "NFCI",
-    "DGS10",
+    "GS10",
     "TB3MS",
     "MED3",
     "TB3SMFFM",
@@ -125,7 +125,7 @@ fred <- fred %>%
     # spreads
     gap = 100*(GDPC1 / GDPPOT - 1),
     baa_aaa = BAA10YM - AAA10YM,
-    t10y3m = DGS10 - TB3MS,
+    t10y3m = GS10 - TB3MS,
     # tedr starts 1970Q1, not 1962Q1 like rest of variables
     tedr = ifelse(tsibble::time_in(qtr, . ~ "1985 Q4"), LIOR3M - TB3MS, TEDRATE), 
     es = MED3 - TB3MS,
@@ -370,10 +370,45 @@ ciss <- ciss %>%
   toRTime() %>%
   dplyr::select(!(date))
 
-# Merge all
+
+
+# ACM term premium --------------------------------------------------------
+library(readxl)
+ACMTermPremium <- read_excel(here::here("data", "ACMTermPremium.xls"))
+
+ACMTermPremium_quarterly <- ACMTermPremium %>% 
+  mutate(DATE = as.Date(DATE,format = "%d-%b-%Y")) %>% 
+  timetk::summarize_by_time(
+    .date_var = DATE,
+    .by = "quarter",
+    dplyr::across(dplyr::where(is.numeric),
+                  \(x) last(x),
+                  .unpack = TRUE
+    ),
+    .type = "ceiling",
+    .week_start = 1
+  ) %>%
+  rename(date = DATE) %>% 
+  #shift to the last day of the period
+  dplyr::mutate(date = timetk::subtract_time(date, "1 day")) %>%
+  #remove column if all NA
+  dplyr::select_if(~ !all(is.na(.))) %>% 
+  mutate(
+    qtr = yearquarter(date)
+  ) %>% 
+  arrange(qtr) %>% 
+  select(!date)
+
+# Merge all ---------------------------------------------------------------
 variables <- purrr::reduce(
   list(fred, yahoo, annual_returns, instruments, gs_fci, gz_ebp_ecy, ciss),
   dplyr::full_join, 
+  by = "qtr"
+)
+
+variables <- purrr::reduce(
+  list(variables, ACMTermPremium_quarterly),
+  dplyr::left_join, 
   by = "qtr"
 )
 
@@ -395,17 +430,23 @@ results$vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,
 results$vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
   rename(vfci_ea = vfci, mu_ea=mu)
 
+# to do: add consumption lags as exogenous, so PC is taken over financial vars only
 results$vfci_lags <- get_vfci(
     variables,
-    "fgr1.gdpc1",
+    "fgr4.gdpc1",
     c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
+    het = c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
     prcomp=TRUE,
     n_prcomp = 4,
     date_begin=date_begin,
     date_end=date_end
-  )$ts %>% 
-  rename(vfci_lags = vfci, mu_lags=mu)
-
+  ) 
+results$vfci_lags$ts <- results$vfci_lags$ts %>% 
+  rename(
+      vfci_lags = vfci,
+      mu_lags=mu
+)
+  
 results$vfci_lags_in_mean <- get_vfci(
     variables,
     "fgr1.gdpc1",
@@ -415,7 +456,8 @@ results$vfci_lags_in_mean <- get_vfci(
     n_prcomp = 4,
     date_begin=date_begin,
     date_end=date_end
-  )$ts %>% 
+  )
+results$vfci_lags_in_mean$ts <- results$vfci_lags_in_mean$ts %>% 
   rename(vfci_lags_in_mean = vfci, mu_lags_in_mean=mu)
 
 results$vfci_lags_in_vol <- get_vfci(
@@ -427,62 +469,85 @@ results$vfci_lags_in_vol <- get_vfci(
     n_prcomp = 4,
     date_begin=date_begin,
     date_end=date_end
-  )$ts %>% 
-  rename(vfci_lags_in_vol = vfci, mu_lags_in_vol=mu)
+  )
+results$vfci_lags_in_vol$ts <- results$vfci_lags_in_vol$ts %>% 
+  rename(
+        vfci_lags_in_vol = vfci,
+        mu_lags_in_vol = mu
+  )
 
+vfci_baseline <- results$fgr1.gdpc1 #results$vfci_lags_in_mean
+# vfci_baseline$ts <- vfci_baseline$ts %>% 
+#   rename(
+#     vfci = vfci_lags_in_mean,
+#     mu = mu_lags_in_mean
+#   )
 # merge, tidy NA
-variables <- purrr::reduce(list(variables, results$fgr1.gdpc1$ts), dplyr::inner_join, by = "qtr")
+variables <- purrr::reduce(
+  list(
+    variables, 
+    vfci_baseline$ts
+    ),
+  dplyr::inner_join, 
+  by = "qtr"
+)
 
 # Create instruments ------------------------------------------------------
 
 # Create data
 unc_bc_data <- variables
 unc_bc_data$vfci_lev <- exp(unc_bc_data$vfci)
-unc_bc_data$DATE <- seq.Date(as.Date('1962-01-01'),as.Date('2022-07-01'),by = 'quarter')
-unc_bc_data <- subset(unc_bc_data, DATE>=as.Date('1962-01-01'))
+minDate <- as.Date(min(unc_bc_data$qtr))
+maxDate <- as.Date(max(unc_bc_data$qtr))
+unc_bc_data$DATE <- seq.Date(minDate,maxDate,by = 'quarter')
+minDate <- max(as.Date(min(unc_bc_data$qtr)),as.Date('1963-01-01'))
+maxDate <- min(as.Date(max(unc_bc_data$qtr)),as.Date('2022-07-01'))
+unc_bc_data <- subset(unc_bc_data, DATE>=minDate & DATE<=maxDate)
 
 ## VFCI instrument (Baseline) ----------------------------------------------
+
 unc_bc_data_baseline <- unc_bc_data[, c("DATE","log.gdpc1","log.pcepilfe","vfci","fedfunds")]
 df_ts_baseline <- as.ts(x = unc_bc_data_baseline[, -1], order.by = unc_bc_data_baseline$DATE)
 constr_vfci_baseline <- c(+3,-2) #-2 is restriction on negative price level
 
 #Penalty function algorithm
-sn_var_vfci <-uhlig.penalty(Y=df_ts_baseline, nlags=4, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
+nlags <- 4
+sn_var_vfci <-uhlig.penalty(Y=df_ts_baseline, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
                             KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
 shocks_penalty_baseline <- sn_var_vfci$SHOCKS
 ss_penalty <- ts(t(apply(shocks_penalty_baseline,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
 vfci_shock_penalty <- as.data.frame(ss_penalty[,1]) %>% setNames(c("vfci_shock_penalty"))
-vfci_shock_penalty$date <- tsibble::yearquarter(seq.Date(as.Date('1963-01-01'),as.Date('2022-07-01'),by = 'quarter'))
+vfci_shock_penalty$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
 
 #Rejection algorithm
-sn_var_vfci <- uhlig.reject(Y=df_ts_baseline, nlags=4, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
+sn_var_vfci <- uhlig.reject(Y=df_ts_baseline, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
                             KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
 shocks_reject_baseline <- sn_var_vfci$SHOCKS
 ss_reject <- ts(t(apply(shocks_reject_baseline,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
 vfci_shock_reject <- as.data.frame(ss_reject[,1]) %>% setNames(c("vfci_shock_reject"))
-vfci_shock_reject$date <- tsibble::yearquarter(seq.Date(as.Date('1963-01-01'),as.Date('2022-07-01'),by = 'quarter'))
+vfci_shock_reject$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
 
 ## VFCI instrument (VFCI in levels) ----------------------------------------
 unc_bc_data_levels <- unc_bc_data[, c("DATE", "log.gdpc1","log.pcepilfe", "vfci_lev", "fedfunds")]
 df_ts_levels <- as.ts(x = unc_bc_data_levels[, -1], order.by = unc_bc_data_levels$DATE)
 constr_vfci_baseline <- c(+3,-2) #-2 is restriction on negative price level
-sn_var_vfci_levels <-uhlig.penalty(Y=df_ts_levels, nlags=4, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
+sn_var_vfci_levels <-uhlig.penalty(Y=df_ts_levels, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
                                    KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
 shocks_levels <- sn_var_vfci_levels$SHOCKS
 ss_levels <- ts(t(apply(shocks_levels,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
 vfci_shock_penalty_vfci_in_levels <- as.data.frame(ss_levels[,1]) %>% setNames(c("vfci_shock_penalty_vfci_in_levels"))
-vfci_shock_penalty_vfci_in_levels$date <- tsibble::yearquarter(seq.Date(as.Date('1963-01-01'),as.Date('2022-07-01'),by = 'quarter'))
+vfci_shock_penalty_vfci_in_levels$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
 
 ## VFCI instrument (Stationary case) ---------------------------------------
 unc_bc_data_stationary <- unc_bc_data[, c("DATE", "gap", "gr4.pcepilfe", "vfci", "fedfunds")]
 df_ts_stationary <- as.ts(x = unc_bc_data_stationary[, -1], order.by = unc_bc_data_stationary$DATE)
 constr_vfci_stationary <- c(+3,-2) #-2 is restriction on negative price level
-sn_var_vfci_stationary <-uhlig.penalty(Y=df_ts_stationary, nlags=4, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
+sn_var_vfci_stationary <-uhlig.penalty(Y=df_ts_stationary, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
                                        KMAX=6, constrained=constr_vfci_stationary, constant=FALSE, steps=20)
 shocks_stationary <- sn_var_vfci_stationary$SHOCKS
 ss_stationary <- ts(t(apply(shocks_stationary,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
 vfci_shock_penalty_stationary_model <- as.data.frame(ss_stationary[,1]) %>% setNames(c("vfci_shock_penalty_stationary_model"))
-vfci_shock_penalty_stationary_model$date <- tsibble::yearquarter(seq.Date(as.Date('1963-01-01'),as.Date('2022-07-01'),by = 'quarter'))
+vfci_shock_penalty_stationary_model$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
 
 ## Merge all instruments ---------------------------------------------------
 instruments_vfci <- purrr::reduce(list(vfci_shock_penalty,vfci_shock_reject,vfci_shock_penalty_vfci_in_levels,vfci_shock_penalty_stationary_model), dplyr::full_join, by = "date")
@@ -546,14 +611,34 @@ variables <- variables %>%
   dplyr::mutate(
     vfci_lev = exp(vfci)
   ) %>% 
-  dplyr::rename(
-    c(
-      infl_pce = gr4.pcepilfe,
+  dplyr::mutate(
+      infl_pce = gr1.pcepilfe,
       lgdp = log.gdpc1,
       lpce = log.pcepilfe,
-      ygr = gr4.gdpc1
-    )
+      ygr = gr1.gdpc1
   ) %>% 
-  dplyr::relocate(c("date","yr","quarter","gdpc1","gdppot","pcepilfe","pcecc96","fedfunds","anfci","nfci","dgs10","tb3ms","med3","tb3smffm","aaa10ym","wtisplc","baa10ym","lior3m","tedrate","vixcls","clvmnacscab1gqea19","ygr","lgdp","infl_pce","gr4.pcecc96","gr4.clvmnacscab1gqea19","gr1.gdpc1","gr1.pcepilfe","gr1.pcecc96","gr1.clvmnacscab1gqea19","lgdp","lpce","log.pcecc96","log.clvmnacscab1gqea19","fgr4.gdpc1","fgr4.pcepilfe","fgr4.pcecc96","fgr4.clvmnacscab1gqea19","fgr1.gdpc1","fgr1.pcepilfe","fgr1.pcecc96","fgr1.clvmnacscab1gqea19","gap","baa_aaa","t10y3m","tedr","es","gspc","gr4.gspc","gr1.gspc","gspc_ret","gspc_vol","mp_shock_ns","mp_shock_mr","mp_shock_rr","mp_shock_int_rr_mar_ns","mp_shock_int_rr_ns","y_shock","std_y_shock","std_mp_shock_ns","std_mp_shock_int_rr_ns","vfci_shock_penalty","vfci_shock_reject","std_vfci_shock_penalty","std_vfci_shock_reject","vfci_shock_penalty_vfci_in_levels","vfci_shock_penalty_stationary_model","std_vfci_shock_penalty_vfci_in_levels","std_vfci_shock_penalty_stationary_model","gsfci","ecy","ebp","gz","ciss","pc1","pc2","pc3","pc4","pc5","pc6","mu","vfci","vfci_lev")) 
+  dplyr::relocate(c(
+    "date","yr","quarter",
+    "gdpc1","gdppot","pcepilfe","pcecc96","fedfunds","anfci","nfci",
+    "gs10","tb3ms","med3","tb3smffm","aaa10ym",
+    "wtisplc","baa10ym","lior3m","tedrate","vixcls","clvmnacscab1gqea19",
+    "ygr","lgdp","infl_pce",
+    "gr4.pcecc96","gr4.clvmnacscab1gqea19",
+    "gr1.gdpc1","gr1.pcepilfe","gr1.pcecc96","gr1.clvmnacscab1gqea19",
+    "lgdp","lpce","log.pcecc96","log.clvmnacscab1gqea19",
+    "fgr4.gdpc1","fgr4.pcepilfe","fgr4.pcecc96","fgr4.clvmnacscab1gqea19",
+    "fgr1.gdpc1","fgr1.pcepilfe","fgr1.pcecc96","fgr1.clvmnacscab1gqea19",
+    "gap","baa_aaa","t10y3m","tedr","es","gspc",
+    "gr4.gspc","gr1.gspc","gspc_ret","gspc_vol",
+    "mp_shock_ns","mp_shock_mr","mp_shock_rr","mp_shock_int_rr_mar_ns","mp_shock_int_rr_ns",
+    "y_shock","std_y_shock","std_mp_shock_ns","std_mp_shock_int_rr_ns","vfci_shock_penalty",
+    "vfci_shock_reject","std_vfci_shock_penalty","std_vfci_shock_reject",
+    "vfci_shock_penalty_vfci_in_levels","vfci_shock_penalty_stationary_model",
+    "std_vfci_shock_penalty_vfci_in_levels","std_vfci_shock_penalty_stationary_model",
+    "gsfci","ecy","ebp","gz","ciss",
+    "pc1","pc2","pc3","pc4","pc5","pc6",
+    "mu","vfci","vfci_lev"
+    )) 
 
 save(variables, file = here::here("variables.RData"))
+
