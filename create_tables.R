@@ -10,7 +10,7 @@ options("modelsummary_format_numeric_latex" = "plain")
 # Tables ------------------------------------------------------------------
 
 ## Table. Principal Components Loadings -----------------------------------
-loadings <- summary(results$fgr1.gdpc1$hetreg$pc)
+loadings <- summary(vfci_baseline$hetreg$pc)
 
 cumvar <- 100*cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
 
@@ -56,8 +56,6 @@ tab <- modelsummary::datasummary(
 #tab
 #as_latex(tab)
 
- 
-
 
 ## Table. Regression of FCIs on PCs -------------------------------------
 reg1 <- paste("nfci","~",paste(paste0("pc", 1:4), collapse='+'))
@@ -73,12 +71,12 @@ models<-list(
 ### Generate table
 Map(\(out) modelsummary::modelsummary(models,
                                       coef_rename = toupper,
-                                      statistic = "std.error", #statistic = "[{statistic}]",
+                                      statistic = "[{statistic}]", #"std.error",
                                       stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
                                       gof_map = c("nobs", "r.squared"),
-                                      fmt= '%.3f',
+                                      fmt_statistic("estimate" = 2, "statistic" = 2),
                                       coef_omit= '(Intercept)',
-                                      caption = "\\textbf{Association between FCIs and PCs} \\label{tab:FCIregressions}",
+                                      title = "Regressions of financial conditions indices on principal components of financial variables \\label{tab:FCIregressions}",
                                       output = out
 ), list("gt",here::here("output","baseline","tables","fcis_on_pcs_new.tex")) )
 
@@ -106,24 +104,18 @@ models <- list(
 Map(\(out) modelsummary::modelsummary(models,
                                       shape="rbind",
                                       coef_rename = toupper,
-                                      statistic = "({std.error})", 
-                                      notes = "Standard errors in parentheses",
+                                      statistic = "({statistic})", #"({std.error})", 
+                                      notes = "$t$-statistics in parentheses",
                                       stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
                                       gof_map = c("nobs", "r.squared"),
-                                      fmt= '%.3f',
+                                      fmt= '%.2f',
                                       coef_omit= '(Intercept)',
-                                      caption = "\\textbf{Heteroskedasticity Linear Regression of GDP and PCE Growth on PCs} \\label{tab:reg2}",
+                                      title = "Conditional mean and volatility of GDP and consumption spanned by financial assets \\label{tab:reg2}",
                                       output = out
 ), list("gt",here::here("output","baseline","tables","significance_of_pcs_1962_2022_new.tex")) )
 
-#                        #statistic = "({p.value})", #statistic = "[{statistic}]",
-#notes = "p-values in parentheses",
-#
-
 # The LR test at the bottom of the output is a test for the parameters of the variance function. The
-# χ
-# 2
-# (1) statistic of 19.59 is significant, indicating that heteroskedasticity is present. If we had preferred
+# χ2(1) statistic of 19.59 is significant, indicating that heteroskedasticity is present. If we had preferred
 # the Wald test for heteroskedasticity instead of the LR test, we would have specified the waldhet
 # option.
 # see if parameters and performance support your model type
@@ -143,8 +135,15 @@ library(modelsummary)
 library(stringr)
 library(tribe)
 
-y <- c("gz","ecy") #,"ebp"
-y_lag <- c("lag(gz)","lag(ecy)") #,"lag(ebp)"
+y <- c("gz","ecy","ebp",
+       "tedr","tedrate","lior3m","es",
+       "ACMY01","ACMTP01","ACMTP05","ACMTP10"
+       ) #
+y_lag <- c("lag(gz)","lag(ecy)","lag(ebp)",
+           "lag(tedr)","lag(tedrate)","lag(lior3m)"
+           ,"lag(es)",
+           "lag(ACMY01)","lag(ACMTP01)","lag(ACMTP05)","lag(ACMTP10)"
+          ) #
 x <- c("vfci","nfci","gsfci","vixcls")
 x <- c(x,paste0(x,collapse="+"))
 
@@ -174,6 +173,7 @@ captions = function(nn){
          ecy="stands for the excess CAPE yield of \\cite{{Shiller2000}} and is a commonly used measure of the equity market CAPE equity risk premium."
   )
 }
+
 
 gm <-tibble::tribble(
   ~raw,        ~clean, ~fmt,

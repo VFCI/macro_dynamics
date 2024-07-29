@@ -1,9 +1,10 @@
 \begin{table}
 \centering
 \begin{talltblr}[         %% tabularray outer open
+caption={Conditional mean and volatility of GDP and consumption spanned by financial assets \textbackslash{}label\{tab:reg2\}},
 entry=none,label=none,
 note{}={* p < 0.1, ** p < 0.05, *** p < 0.01},
-note{ }={Standard errors in parentheses},
+note{ }={\$t\$-statistics in parentheses},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
 colspec={Q[]Q[]Q[]},
@@ -22,6 +23,10 @@ cell{14}{1}={preto={\hspace{1em}}},
 cell{15}{1}={preto={\hspace{1em}}},
 cell{16}{1}={preto={\hspace{1em}}},
 cell{17}{1}={preto={\hspace{1em}}},
+cell{18}{1}={preto={\hspace{1em}}},
+cell{19}{1}={preto={\hspace{1em}}},
+cell{20}{1}={preto={\hspace{1em}}},
+cell{21}{1}={preto={\hspace{1em}}},
 column{1}={halign=l,},
 column{2}={halign=c,},
 column{3}={halign=c,},
@@ -29,20 +34,24 @@ column{3}={halign=c,},
 \toprule
 & Real GDP Growth & Real Consumption Growth \\ \midrule %% TinyTableHeader
 Conditional Mean && \\
-PC1      & -0.189*** & -0.148*** \\
-& (0.046)   & (0.038)   \\
-PC2      & 0.156***  & 0.100***  \\
-& (0.047)   & (0.037)   \\
-PC3      & 0.147**   & 0.162***  \\
-& (0.057)   & (0.046)   \\
-PC4      & -0.118*   & -0.072    \\
-& (0.062)   & (0.053)   \\
-Num.Obs. & 243       & 243       \\
+PC1      & -0.19*** & -0.15*** \\
+& (-4.13)  & (-3.94)  \\
+PC2      & 0.16***  & 0.10***  \\
+& (3.35)   & (2.66)   \\
+PC3      & 0.15**   & 0.16***  \\
+& (2.56)   & (3.48)   \\
+PC4      & -0.12*   & -0.07    \\
+& (-1.91)  & (-1.38)  \\
+Num.Obs. & 243      & 243      \\
 Conditional Log-Volatility && \\
-PC1      & 0.218***  & 0.170**   \\
-PC2      & -0.336*** & -0.265*** \\
-PC3      & -0.262*** & -0.304*** \\
-PC4      & 0.339***  & 0.716***  \\
+PC1      & 0.22***  & 0.17**   \\
+& (3.03)   & (2.42)   \\
+PC2      & -0.34*** & -0.27*** \\
+& (-3.36)  & (-2.71)  \\
+PC3      & -0.26*** & -0.30*** \\
+& (-2.85)  & (-2.98)  \\
+PC4      & 0.34***  & 0.72***  \\
+& (3.37)   & (7.08)   \\
 \bottomrule
 \end{talltblr}
 \end{table}
