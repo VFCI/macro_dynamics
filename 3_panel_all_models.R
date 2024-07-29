@@ -2,8 +2,10 @@
 #-------------------------------------------------------------------------------
 
 # Load data
-load(here::here("output",paste0("mcmc_out_",type,"_ir",".Rdata")))
-load(here::here("output",paste0("svariv_lpiv_chol_sn_",type,".Rdata")))
+filename_mc = paste0("output/","mcmc_out_",type,"_ir",".Rdata")
+filename_iv = paste0("output/","svariv_lpiv_chol_sn_",type,".Rdata")
+base::load(filename_mc)
+base::load(filename_iv)
 
 #-------------------------------------------------------------------------------
 # Note - There are 4 configurable parameters 

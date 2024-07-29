@@ -96,4 +96,8 @@ if (my_choice == 'gaussian'){
       
 }
 
+# Save output
+save(mdd_output,file = paste0('output/gibbs_out_',type,'.Rdata'))
+
+
 #-------------------------------------------------------------------------------
