@@ -24,7 +24,8 @@ get_vfci <- function(data,y,x,het=x,prcomp=TRUE,n_prcomp = 4, date_begin="1962 Q
   data <- data %>% 
     tsibble::as_tsibble() %>% 
     tsibble::filter_index(date_begin ~ date_end) %>% 
-    tibble::as_tibble()
+    tibble::as_tibble() %>% 
+    tidyr::drop_na(any_of(as.character(c(y,x,het))))
   
   if (prcomp) {
     pca <- get_pc(data,x,...)
