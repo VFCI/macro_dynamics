@@ -19,7 +19,6 @@ You can install the project from
 
 ``` r
 # install.packages("devtools")
-# library(devtools)
 devtools::install_github("VFCI/macro_dynamics")
 ```
 
@@ -63,3 +62,36 @@ before running `0_main.R`.
 
 [ALFRED](https://alfred.stlouisfed.org), the archival version of FRED,
 can be used to retreive different vintages of FRED data.
+
+## Github Codespaces
+
+You can also run this project using Github
+[codespaces](https://github.com/features/codespaces). which sets up an
+environment that is pre-configured to runs this repository’s code (has
+the right version of R, R studio, VSCode, etc.).
+
+To create a codespace, see [Creating a codespace for a
+repository](https://docs.github.com/en/codespaces/developing-in-a-codespace/creating-a-codespace-for-a-repository).
+Then [open the
+codespace](https://docs.github.com/en/codespaces/developing-in-a-codespace/opening-an-existing-codespace).
+Both creating and opening take a few minutes the first time.
+
+Upon opening the codespace, VSCode should open up in one of your
+browser’s tabs. Wait until the setup code finishes execution and all
+VSCode extensions are loaded.
+
+Close any ports if any are open using the [ports
+tab](https://code.visualstudio.com/docs/editor/port-forwarding) in
+VSCode. Then in Terminal, run
+
+``` bash
+docker run --rm -ti -e PASSWORD=yourpassword -p 8787:8787 rocker/rstudio
+```
+
+Make sure you replace `yourpassword` by a suitable password of your
+choice. After some initial setting up, VSCode should prompt you to open
+RStudio in a new tab in your browser. Use the username `rstudio` and the
+password you chose to log in to RStudio.
+
+Now that you are in RStudio, you should be able to follow the steps
+outlined above to install and run the repository.
