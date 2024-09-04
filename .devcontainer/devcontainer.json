@@ -1,6 +1,6 @@
 {
 	"name": "R (rocker/tidyverse)",
-	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.2",
+	"image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.4",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
