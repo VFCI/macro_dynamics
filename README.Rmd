@@ -1,0 +1,59 @@
+---
+output:
+  github_document:
+    html_preview: true
+---
+
+<!-- README.md is generated from README.Rmd. Please edit README.Rmd (this file) -->
+
+```{r, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# macro_dynamics
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+An [R](http://r-project.org) project that replicates [The Market Price of Risk and Macro-Financial Dynamics](https://drive.google.com/file/d/1Hr_lrsj5WpqpBeSySCgboDiox0azblID/view?usp=sharing), by Tobias Adrian, Fernando Duarte and Tara Iyer.
+
+## Installation
+
+You can install the project from [GitHub](https://github.com/VFCI/macro_dynamics) with:
+
+``` r
+# install.packages("devtools")
+# library(devtools)
+devtools::install_github("VFCI/macro_dynamics")
+```
+
+## Running this Project
+Open the project `macro_dynamics.Rproj` in [R](http://r-project.org).
+
+Run `0_main.R` to recreate all output of the project relying only upon the raw data files in the `data/` folder (and packages).
+
+The folder `output/baseline/` has the figures and tables in [The Market Price of Risk and Macro-Financial Dynamics](https://drive.google.com/file/d/1Hr_lrsj5WpqpBeSySCgboDiox0azblID/view?usp=sharing). The folder `output/appendix/` has figures and tables in the Appendix.
+
+This project uses the R package [renv](https://rstudio.github.io/renv/articles/renv.html) for package version control. Running `main.R` automatically reinstantiates the project with the correct packages, but this can also be done manually with `renv::restore()`.
+
+Note: `0_main.R` runs Monte Carlo simulations, so it takes a few minutes
+to run to completion. To recreate all the results that do not require
+Monte Carlo, run `0_main.R` up to [this line](https://github.com/VFCI/macro_dynamics/blob/e06107f35180c4d9e0cb92a1abe717f5ee30bece/0_main.R#L57).
+
+## Data
+Running `0_main.R` pulls the latest data from [FRED](https://fred.stlouisfed.org) and other sources. These latest data may not be the exact vintage used in the paper. If you want to see the exact data used in the paper, run
+
+``` r
+base::load("variables.RData")
+```
+
+before running `0_main.R`.
+
+### Vintage data
+
+[ALFRED](https://alfred.stlouisfed.org), the archival version of FRED, can be used to retreive different vintages of FRED data.

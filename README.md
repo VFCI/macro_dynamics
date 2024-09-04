@@ -1,30 +1,65 @@
+
+<!-- README.md is generated from README.Rmd. Please edit README.Rmd (this file) -->
+
 # macro_dynamics
 
-**A. How to run this:**
+<!-- badges: start -->
 
-To generate all the IRFs in the paper and appendix, open "0_Main.R", change the directory in line 20, and run the script. It will run through the models and output the required output for the paper in the folder called "Output", which can then be uploaded to Overleaf.
+<!-- badges: end -->
 
+An [R](http://r-project.org) project that replicates [The Market Price
+of Risk and Macro-Financial
+Dynamics](https://drive.google.com/file/d/1Hr_lrsj5WpqpBeSySCgboDiox0azblID/view?usp=sharing),
+by Tobias Adrian, Fernando Duarte and Tara Iyer.
 
+## Installation
 
-**B: General workflow of the code:**
+You can install the project from
+[GitHub](https://github.com/VFCI/macro_dynamics) with:
 
-* A number of scenarios assigned to "type" are found in 0_Main.R. 
-* For several of these model types, the following seven 7 scripts are called (those cases where a panel chart with all five models is generated in the end). 
-* For other model types, only the scripts with 1_.. are called (those cases where only the BPSS BVAR is used)
+``` r
+# install.packages("devtools")
+# library(devtools)
+devtools::install_github("VFCI/macro_dynamics")
+```
 
+## Running this Project
 
-**1_vol_bvar_calibration.R:** Provides the calibration for all scenarios (variable in the BPSS BVAR, Bayesian parameters, configuration for the IRFs etc)
+Open the project `macro_dynamics.Rproj` in [R](http://r-project.org).
 
-**1_vol_bvar_estimation.R:** Calculates the posterior mode and runs the MCMC algorithm using functions in the Functions folder
+Run `0_main.R` to recreate all output of the project relying only upon
+the raw data files in the `data/` folder (and packages).
 
-**1_vol_bvar_output.R:** Generates the IRF panels using functions in the Functions folder
+The folder `output/baseline/` has the figures and tables in [The Market
+Price of Risk and Macro-Financial
+Dynamics](https://drive.google.com/file/d/1Hr_lrsj5WpqpBeSySCgboDiox0azblID/view?usp=sharing).
+The folder `output/appendix/` has figures and tables in the Appendix.
 
+This project uses the R package
+[renv](https://rstudio.github.io/renv/articles/renv.html) for package
+version control. Running `main.R` automatically reinstantiates the
+project with the correct packages, but this can also be done manually
+with `renv::restore()`.
 
-**2_svar_lpiv_chol_sn_calibration.R:** Provides the calibration for all scenarios (for all the four other identification schemes: SVAR-IV, LP-IV, Cholesky, Sign Restrictions)
+Note: `0_main.R` runs Monte Carlo simulations, so it takes a few minutes
+to run to completion. To recreate all the results that do not require
+Monte Carlo, run `0_main.R` up to [this
+line](https://github.com/VFCI/macro_dynamics/blob/e06107f35180c4d9e0cb92a1abe717f5ee30bece/0_main.R#L57).
 
-**2_svar_lpiv_chol_sn_estimation.R:** Estimates the four other identification schemes
+## Data
 
-**2_svar_lpiv_chol_sn_output.R:** Outputs the results from the four other identification schemes
+Running `0_main.R` pulls the latest data from
+[FRED](https://fred.stlouisfed.org) and other sources. These latest data
+may not be the exact vintage used in the paper. If you want to see the
+exact data used in the paper, run
 
+``` r
+base::load("variables.RData")
+```
 
-**3_panel_all_models.R:** Pulls in the rsults from the five identification schemes and creates the panel graphs for Fed Funds<-->VFCI and Output<-->VFCI
+before running `0_main.R`.
+
+### Vintage data
+
+[ALFRED](https://alfred.stlouisfed.org), the archival version of FRED,
+can be used to retreive different vintages of FRED data.
