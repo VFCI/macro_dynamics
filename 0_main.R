@@ -84,7 +84,7 @@ for (i in five_model_robustness) {
 # 10. 100,000 draws in the MCMC chain
 # 11. 1 million draws in the MCMC chain
 
-vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k", "1M")  
+vol_bvar_robustness_a <- c("regimes", "pre_crisis", "normal", "100k") # "1M")  
 for (i in vol_bvar_robustness_a) {
   type = i
   source('1_vol_bvar_calibration.R')
@@ -92,7 +92,7 @@ for (i in vol_bvar_robustness_a) {
   source('1_vol_bvar_output.R')
 }
  
-vol_bvar_robustness_b <- c("horserace_gz", "horserace_tedr","horserace_ecy", "horserace_nfci")  
+vol_bvar_robustness_b <- c("horserace_gz", "horserace_tedr") # "horserace_ecy", "horserace_nfci")  
 for (i in vol_bvar_robustness_b) {
   type = i
   source('1_vol_bvar_calibration.R')
