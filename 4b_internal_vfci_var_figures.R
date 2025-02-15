@@ -77,7 +77,7 @@ p_iv_int_vfci <-
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
   geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
-  scale_x_continuous(limits = c(0, 20), expand = c(0,0)) + 
+  scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = NULL) +
   theme_classic() +
   theme(
@@ -105,7 +105,7 @@ p_chol_ext_vfci <-
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
   geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
-  scale_x_continuous(limits = c(0, 20), expand = c(0,0)) + 
+  scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = "Cholesky, External VFCI") +
   theme_classic() +
   theme(
@@ -131,7 +131,7 @@ p_chol_int_vfci_last <-
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
   geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
-  scale_x_continuous(limits = c(0, 20), expand = c(0,0)) +
+  scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = "Cholesky, Internal VFCI") +
   theme_classic() +
   theme(
