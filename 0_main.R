@@ -44,6 +44,13 @@ for (i in ff_y) {
   source('3_panel_all_models.R')
 }
 
+### Internal VFCI --------------------------------------------------------------
+source('4_internal_vfci_var_calibration.R')
+source('4_internal_vfci_var_estimation.R')
+source('4_internal_vfci_var_output.R')
+
+source('4b_internal_vfci_var_figures.R')
+
 # Robustness of the five identification schemes --------------------------------
 
 #Robustness
