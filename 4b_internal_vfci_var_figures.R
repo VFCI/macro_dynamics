@@ -1,8 +1,10 @@
 library(ggplot2)
+library(data.table)
 library(patchwork)
 
 ## Settings
 output_dir <- "output/baseline/figures/"
+appendix_dir <- "output/appendix/figures/"
 colors <- c("#4E8542","#2166AC","#8E0152","darkorange","darkgoldenrod3", "#cca5d6")
 vfci_color <- paletteer_d("ggthemes::excel_Ion")[1] #colors[1]
 fig_width <- 8  #in inches
@@ -106,7 +108,7 @@ p_chol_ext_vfci <-
   geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
   scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
-  labs(x = NULL, y = NULL, title = "Cholesky, External VFCI") +
+  labs(x = NULL, y = NULL, title = "External VFCI") +
   theme_classic() +
   theme(
     legend.title=element_blank(),
@@ -132,7 +134,7 @@ p_chol_int_vfci_last <-
   geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
   scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
-  labs(x = NULL, y = NULL, title = "Cholesky, Internal VFCI") +
+  labs(x = NULL, y = NULL, title = "Internal VFCI") +
   theme_classic() +
   theme(
     legend.title=element_blank(),
@@ -149,11 +151,10 @@ filler_p <- ggplot() + geom_blank() + theme_classic() + theme_void() + labs(titl
 
 p <-
   (p_chol_ext_vfci |
-  p_chol_int_vfci_last |
-  (filler_p / p_iv_int_vfci + plot_layout(heights = c(1, 3.33)))) 
+  p_chol_int_vfci_last )
 
 p |> print()
 
-fname <- here::here(paste0(output_dir, "comp_irf_vfci_int_vfci.png"))
-cowplot::save_plot(fname, p, base_width = 8, base_height = 11)
+fname <- here::here(paste0(appendix_dir, "comp_irf_vfci_int_vfci.pdf"))
+cowplot::save_plot(fname, p, base_width = 6, base_height = 8)
 
