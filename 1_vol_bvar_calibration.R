@@ -168,7 +168,7 @@ nlags_calibration     <- 4
 mn_tight_calib <- 3
 mn_decay_calib <- 0.5
 if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci" | type == "horserace_no_vfci_yes_gz" | type == "horserace_gz_tedr" | type == "horserace_no_vfci_yes_tedr"| type ==  "horserace_no_vfci_yes_gz_tedr") {
-  mn_tight_calib <- 0.5     # with second financial variable
+  mn_tight_calib <- 3     # with second financial variable
 }  
 
 #-------------------------------------------------------------------------------
@@ -184,7 +184,12 @@ if (type == "normal") {
 
 # Tuning parameters
 hessian_scaling = 0.05 ## scaling of inverse hessian as covariance matrix
+
 disperse = TRUE ## if TRUE, disperse the starting point using inverse hessian as covariance matrix
+## For some of the robustness checks, the inverse hessian matrix doesn't work, so we set disperse to FALSE
+if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci" | type == "horserace_no_vfci_yes_gz" | type == "horserace_gz_tedr" | type == "horserace_no_vfci_yes_tedr"| type ==  "horserace_no_vfci_yes_gz_tedr") {
+  disperse <- FALSE
+}
 
 # MCMC Chain
 total_draws <- 10000
