@@ -7,99 +7,99 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.005,0.001))
+  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.5,0.05))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.2),c(-0.05,0.15))
   
 } else if (type == "regimes") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock  <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.007,0.001))
+  yaxis_vfci_shock  <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.7,0.1))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.3),c(-0.05,0.3))
   
 } else if (type == "normal") {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock     <- list(c(-0.02,0.002),c(-0.01,0.01),c(-0.05,0.3),c(-0.01,0.001))
+  yaxis_vfci_shock     <- list(c(-0.02,0.002),c(-0.01,0.01),c(-0.05,0.3),c(-0.1,0.1))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.3),c(-0.05,0.25))
   
 } else if (type == "stationary") {
   vars_in_system <- c('ygr','infl_pce','vfci','fedfunds') 
   var_names      <- c("GDP Growth", "PCE Inflation", "VFCI", "Fed Funds")
   shock_names    <- c("GDP Growth shock", "PCE inflation shock", "VFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.005,0.001))
+  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.5,0.05))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.2),c(-0.05,0.15))
   
 } else if (type == "vfci_lev") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci_lev','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", " Exponential VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "Exponential VFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.005,0.001))
+  yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.5,0.05))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.2),c(-0.05,0.15))
   
 } else if (type == "horserace_ecy") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'ecy', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "ECY", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "ECY shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_gz") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'gz', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "GZ", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "GZ shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 }  else if (type == "horserace_tedr") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'tedr', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "TEDR", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "TEDR shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_nfci") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'nfci', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "NFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "NFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_gsfci") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'gsfci', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "GSFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "GSFCI shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_gz_tedr") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci', 'gz', 'tedr', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "GZ", "TEDR", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "GZ shock", "TEDR shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.4),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.1),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.6,0.05),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_no_vfci_yes_gz") {
   vars_in_system <- c('lgdp', 'lpce', 'gz', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "GZ", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "GZ shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.1,0.15)) 
   
 } else if (type == "horserace_no_vfci_yes_tedr") {
   vars_in_system <- c('lgdp', 'lpce', 'tedr', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "TEDR", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "TEDR shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.15,0.15)) 
   
 } else if (type == "horserace_no_vfci_yes_gz_tedr") {
   vars_in_system <- c('lgdp', 'lpce', 'gz', 'tedr', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "GZ",  "TEDR", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock","GZ shock", "TEDR shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.4),c(-0.04,0.4),c(-0.005,0.001))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.1),c(-0.04,0.1),c(-0.015,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.04,0.3),c(-0.5,0.05))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.04,0.3),c(-0.1,0.15)) 
   
 }
 
