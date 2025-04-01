@@ -37,15 +37,16 @@ p <-
     breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
   )  +
   ylab("Normalized index") +
+  ylim(-2, 5) +
   theme_classic() +
   theme(
     legend.title=element_blank(),
     legend.position = c(0.18,0.9),
     legend.direction="vertical",
-    axis.title.y = element_text(size = 10),
+    axis.title.y = element_text(size = 14),
     panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 10),
-    legend.text = element_text(size = 10)
+    axis.text = element_text(size = 14),
+    legend.text = element_text(size = 14)
   )  +
   scale_color_manual(
     breaks = c("VFCI", "Internal VFCI"),

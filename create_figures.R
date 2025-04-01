@@ -14,7 +14,7 @@ base::load(file = here::here("variables.RData"))
 
 ## Standardized FCI ---------------------------------------
 # pick dates, variables
-date_begin <- "1970 Q1"
+date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
@@ -67,7 +67,7 @@ variables_fig <- variables %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=vfci,colour="VFCI"),na.rm=FALSE,size=1.25)  +
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25)  +
   scale_fill_hue(l=40) +
   tsibble::scale_x_yearquarter(
     name = "",
@@ -75,7 +75,7 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
   ) +
   ylab("Normalized index") +
-  ylim(-0.75, 1.25) +
+  ylim(-2, 5) +
   theme_classic() +
   theme(
     axis.title.y = element_text(size = 14),
@@ -146,8 +146,8 @@ variables_fig <- variables %>%
   dplyr::mutate(date=as.Date(qtr))
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=vfci,colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=vfci_pce,colour="PCE-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) +
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
+  geom_line(aes(y=scale(vfci_pce),colour="PCE-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) +
   tsibble::scale_x_yearquarter(
     name = "",
     date_labels="%Y-q%q",
@@ -164,7 +164,7 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     axis.text = element_text(size = 14),
     legend.text = element_text(size = 14)
   )  +
-  ylim(-1.1,1.3) +
+  ylim(-2,5) +
   scale_color_manual(breaks = c("VFCI","PCE-VFCI"),
                      values=c(vfci_color, colors[1]),
                      labels=c("VFCI","Consumption-VFCI")
@@ -188,9 +188,9 @@ variables_fig <- variables %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=vfci,colour="VFCI"),na.rm=FALSE,linewidth=1.25) +
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,linewidth=1.25) +
   geom_line(
-    aes(y=vfci_ind,colour="Individual-VFCI"),
+    aes(y=scale(vfci_ind),colour="Individual-VFCI"),
             na.rm=FALSE,linetype="longdash",linewidth=1.25
   ) +
   tsibble::scale_x_yearquarter(
@@ -209,13 +209,13 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     axis.text = element_text(size = 14),
     legend.text = element_text(size = 14)
   )  +
-  ylim(-1.2, 2) +
+  ylim(-2, 6) +
   scale_color_manual(breaks = c("VFCI","Individual-VFCI"),
                      values=c(vfci_color, colors[5]),
                      labels=c("VFCI","VFCI using all financial variables")
   )
 p %>% print
-
+    
 fname <- here::here(paste0(output_dir,"vfci_gdp_and_indiv.png"))
 #ggsave(fname, width = fig_width, height = fig_height)
 cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
@@ -231,8 +231,8 @@ variables_fig  <- variables %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=vfci,colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=vfci_ea,colour="EA-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) + 
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
+  geom_line(aes(y=scale(vfci_ea),colour="EA-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) + 
   tsibble::scale_x_yearquarter(
     name = "",
     date_labels="%Y-q%q",
@@ -249,7 +249,7 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     axis.text = element_text(size = 14),
     legend.text = element_text(size = 14)
   )  +
-  ylim(-1, 3) +
+  ylim(-2, 5) +
   scale_color_manual(breaks = c("VFCI","EA-VFCI"),
                      values=c(vfci_color, colors[2]),#c("blue","red"),
                      labels=c("VFCI United States","VFCI Euro Area")
