@@ -167,9 +167,6 @@ nlags_calibration     <- 4
 
 mn_tight_calib <- 3
 mn_decay_calib <- 0.5
-if (type == "horserace_gz" | type == "horserace_tedr" | type =="horserace_ecy" | type == "horserace_gsfci" | type == "horserace_nfci" | type == "horserace_no_vfci_yes_gz" | type == "horserace_gz_tedr" | type == "horserace_no_vfci_yes_tedr"| type ==  "horserace_no_vfci_yes_gz_tedr") {
-  mn_tight_calib <- 3     # with second financial variable
-}  
 
 #-------------------------------------------------------------------------------
 #4. Calibration for MCMC algorithm
