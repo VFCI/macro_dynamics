@@ -6,7 +6,7 @@ library(dint)
 library(ggplot2)
 library(paletteer)
 output_dir <- "output/baseline/figures/"
-colors <- c("#4E8542","#2166AC","#8E0152","darkorange","darkgoldenrod3")
+colors <- c("#4E8542","#2166AC","#8E0152","darkorange","darkgoldenrod3", "cyan3")
 vfci_color <- paletteer_d("ggthemes::excel_Ion")[1] #colors[1]
 fig_width <- 8 #in inches
 fig_height <- 5 #in inches
@@ -259,4 +259,46 @@ p %>% print
 fname <- here::here(paste0(output_dir,"us_ea_vfci.png"))
 #ggsave(fname, width = fig_width, height = fig_height)
 cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+
+
+## VFCI and VFCI-Yields ----------------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig  <- variables %>%
+  dplyr::left_join(results$vfci_yields, by="qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_yields) %>%
+  tsibble::as_tsibble() %>% 
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
+  geom_line(aes(y=scale(vfci_yields),colour="VFCI-Yields"),na.rm=FALSE,linetype="longdash",size=1.25) + 
+  tsibble::scale_x_yearquarter(
+    name = "",
+    date_labels="%Y-q%q",
+    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
+  )  +
+  ylab("Normalized index") +
+  theme_classic() +
+  theme(
+    legend.title=element_blank(),
+    legend.position = c(0.18,0.9),
+    legend.direction="vertical",
+    axis.title.y = element_text(size = 14),
+    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
+    axis.text = element_text(size = 14),
+    legend.text = element_text(size = 14)
+  )  +
+  ylim(-2, 5) +
+  scale_color_manual(breaks = c("VFCI","VFCI-Yields"),
+                     values=c(vfci_color, colors[6]),
+                     labels=c("VFCI","VFCI with Yields")
+  )
+p %>% print
+
+fname <- here::here(paste0(output_dir,"vfci_yields.png"))
+#ggsave(fname, width = fig_width, height = fig_height)
+cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+
 

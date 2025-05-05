@@ -24,7 +24,10 @@ fred_raw <- tidyquant::tq_get(
     "LIOR3M",
     "TEDRATE",
     "VIXCLS",
-    "CLVMNACSCAB1GQEA19"
+    "CLVMNACSCAB1GQEA19",
+    "DGS10",
+    "DGS5",
+    "DGS1"
   ),
   get = "economic.data",
   from = "1960-1-1", # "1928-01-01",
@@ -491,6 +494,13 @@ variables <- purrr::reduce(
   dplyr::inner_join, 
   by = "qtr"
 )
+
+## Need to use the PC calculated above to estimate this VFCI robustness
+pcs <- paste0("pc", 1:4)
+variables <- variables |> mutate(f1.dgs1 = lead(dgs1), f1.dgs5 = lead(dgs5), f1.dgs10 = lead(dgs10))
+results$vfci_yields <- get_vfci(variables, y = "fgr1.gdpc1", x = c(pcs, "f1.dgs1", "f1.dgs5", "f1.dgs10"), het = (pcs), prcomp=FALSE, n_prcomp = 4, date_begin=date_begin, date_end=date_end)$ts %>% 
+  rename(vfci_yields = vfci, mu_yields = mu)
+
 
 # Create instruments ------------------------------------------------------
 
