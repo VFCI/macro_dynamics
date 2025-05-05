@@ -91,8 +91,8 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   vars_in_system <- c('lgdp', 'lpce', 'tedr', 'fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "TEDR", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "TEDR shock", "Fed Funds shock")
-  yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.04,0.3),c(-0.5,0.05))
-  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.05,0.05),c(-0.04,0.3),c(-0.15,0.15)) 
+  yaxis_vfci_shock    <- list(c(-0.015,0.010),c(-0.010,0.010),c(-0.04,0.6),c(-0.75,0.15))
+  yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.25,0.10),c(-0.04,0.6),c(-0.15,0.15)) 
   
 } else if (type == "horserace_no_vfci_yes_gz_tedr") {
   vars_in_system <- c('lgdp', 'lpce', 'gz', 'tedr', 'fedfunds') 
