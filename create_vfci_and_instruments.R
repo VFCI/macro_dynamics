@@ -433,51 +433,6 @@ results$vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,
 results$vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
   rename(vfci_ea = vfci, mu_ea=mu)
 
-# to do: add consumption lags as exogenous, so PC is taken over financial vars only
-results$vfci_lags <- get_vfci(
-    variables,
-    "fgr4.gdpc1",
-    c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
-    het = c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
-    prcomp=TRUE,
-    n_prcomp = 4,
-    date_begin=date_begin,
-    date_end=date_end
-  ) 
-results$vfci_lags$ts <- results$vfci_lags$ts %>% 
-  rename(
-      vfci_lags = vfci,
-      mu_lags=mu
-)
-  
-results$vfci_lags_in_mean <- get_vfci(
-    variables,
-    "fgr1.gdpc1",
-    c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
-    het = financial_vars,
-    prcomp=TRUE,
-    n_prcomp = 4,
-    date_begin=date_begin,
-    date_end=date_end
-  )
-results$vfci_lags_in_mean$ts <- results$vfci_lags_in_mean$ts %>% 
-  rename(vfci_lags_in_mean = vfci, mu_lags_in_mean=mu)
-
-results$vfci_lags_in_vol <- get_vfci(
-    variables,
-    "fgr1.gdpc1",
-    financial_vars,
-    het = c(financial_vars,"gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1"),
-    prcomp=TRUE,
-    n_prcomp = 4,
-    date_begin=date_begin,
-    date_end=date_end
-  )
-results$vfci_lags_in_vol$ts <- results$vfci_lags_in_vol$ts %>% 
-  rename(
-        vfci_lags_in_vol = vfci,
-        mu_lags_in_vol = mu
-  )
 
 vfci_baseline <- results$fgr1.gdpc1 #results$vfci_lags_in_mean
 # vfci_baseline$ts <- vfci_baseline$ts %>% 
@@ -495,11 +450,57 @@ variables <- purrr::reduce(
   by = "qtr"
 )
 
-## Need to use the PC calculated above to estimate this VFCI robustness
+## Need to use the PC calculated above to estimate the following VFCI robustness
 pcs <- paste0("pc", 1:4)
 variables <- variables |> mutate(f1.dgs1 = lead(dgs1), f1.dgs5 = lead(dgs5), f1.dgs10 = lead(dgs10))
-results$vfci_yields <- get_vfci(variables, y = "fgr1.gdpc1", x = c(pcs, "f1.dgs1", "f1.dgs5", "f1.dgs10"), het = (pcs), prcomp=FALSE, n_prcomp = 4, date_begin=date_begin, date_end=date_end)$ts %>% 
+results$vfci_yields <- get_vfci(variables, y = "fgr1.gdpc1", x = c(pcs, "f1.dgs1", "f1.dgs5", "f1.dgs10"), het = c(pcs), prcomp=FALSE, n_prcomp = 4, date_begin=date_begin, date_end=date_end)$ts %>% 
   rename(vfci_yields = vfci, mu_yields = mu)
+
+lag_vars <- c("gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1")
+results$vfci_lags <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    c(pcs, lag_vars),
+    het = c(pcs, lag_vars),
+    prcomp=FALSE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  ) 
+results$vfci_lags$ts <- results$vfci_lags$ts %>% 
+  rename(
+      vfci_lags = vfci,
+      mu_lags=mu
+)
+  
+results$vfci_lags_in_mean <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    c(pcs, lag_vars),
+    het = pcs,
+    prcomp=FALSE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  )
+results$vfci_lags_in_mean$ts <- results$vfci_lags_in_mean$ts %>% 
+  rename(vfci_lags_in_mean = vfci, mu_lags_in_mean=mu)
+
+results$vfci_lags_in_vol <- get_vfci(
+    variables,
+    "fgr1.gdpc1",
+    financial_vars,
+    het = c(pcs, lag_vars),
+    prcomp=FALSE,
+    n_prcomp = 4,
+    date_begin=date_begin,
+    date_end=date_end
+  )
+results$vfci_lags_in_vol$ts <- results$vfci_lags_in_vol$ts %>% 
+  rename(
+        vfci_lags_in_vol = vfci,
+        mu_lags_in_vol = mu
+  )
 
 
 # Create instruments ------------------------------------------------------

@@ -302,3 +302,49 @@ fname <- here::here(paste0(output_dir,"vfci_yields.png"))
 cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
 
 
+
+## VFCI and Lags ----------------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig  <- variables %>%
+  dplyr::left_join(results$vfci_lags$ts, by="qtr") %>%
+  dplyr::left_join(results$vfci_lags_in_mean$ts, by="qtr") %>%
+  dplyr::left_join(results$vfci_lags_in_vol$ts, by="qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_lags, vfci_lags_in_mean, vfci_lags_in_vol) %>%
+  tsibble::as_tsibble() %>% 
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
+  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
+  geom_line(aes(y=scale(vfci_lags),colour="VFCI-lags"),na.rm=FALSE,linetype="longdash",size=1.25) + 
+  geom_line(aes(y=scale(vfci_lags_in_mean),colour="VFCI-lags-in-mean"),na.rm=FALSE,linetype="dashed",size=1.25) + 
+  geom_line(aes(y=scale(vfci_lags_in_vol),colour="VFCI-lags-in-vol"),na.rm=FALSE,linetype="dotdash",size=1.25) + 
+  tsibble::scale_x_yearquarter(
+    name = "",
+    date_labels="%Y-q%q",
+    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
+  )  +
+  ylab("Normalized index") +
+  theme_classic() +
+  guides(color=guide_legend(ncol=2)) +
+  theme(
+    legend.title=element_blank(),
+    legend.position = c(0.33,0.9),
+    legend.direction="vertical",
+    axis.title.y = element_text(size = 14),
+    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
+    axis.text = element_text(size = 14),
+    legend.text = element_text(size = 14)
+  )  +
+  ylim(-2, 5) +
+  scale_color_manual(breaks = c("VFCI","VFCI-lags","VFCI-lags-in-mean","VFCI-lags-in-vol"),
+                     values=c(vfci_color, "gray20","gray50", "gray80"),
+                     labels=c("VFCI", "VFCI with lags", "VFCI with lags in mean", "VFCI with lags in volatility")
+  )
+p %>% print
+
+fname <- here::here(paste0(output_dir,"vfci_lags.png"))
+#ggsave(fname, width = fig_width, height = fig_height)
+cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+
