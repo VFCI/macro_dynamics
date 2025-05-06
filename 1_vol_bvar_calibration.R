@@ -197,8 +197,12 @@ if (type == "100k") {
 }
 draws_step <- 100
 ndraw = total_draws ## total draws to record 
-nsep = 1    ## number of draws per recorded draws  
+nsep = 1    ## number of draws per recorded draws
+
+## Note that while the program `gdraw` will print out a message every 100 draws,
+## it only saves to the disk on the savepots
 savespots = seq(min(draws_step,ndraw),ndraw,length.out=10) ## draws at which to save output
+if (type == "1M") savespots = seq(min(draws_step,ndraw),ndraw,length.out=100) ## draws at which to save output
 
 # Number of cores to use in parallelization
 ncore = 1   
