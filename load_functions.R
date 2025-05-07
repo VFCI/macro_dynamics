@@ -8,7 +8,5 @@ load_functions = function() {
     sapply(funlist, FUN = source)
   }
   
-  ## requiring certain R packages
-  source('install_packages.R')
 }
 
