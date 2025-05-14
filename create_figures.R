@@ -6,11 +6,41 @@ library(dint)
 library(ggplot2)
 library(paletteer)
 output_dir <- "output/baseline/figures/"
-colors <- c("#4E8542","#2166AC","#8E0152","darkorange","darkgoldenrod3", "cyan3")
-vfci_color <- paletteer_d("ggthemes::excel_Ion")[1] #colors[1]
-fig_width <- 8 #in inches
-fig_height <- 5 #in inches
+colors <- c("#4E8542", "#2166AC", "#8E0152", "darkorange", "darkgoldenrod3", "cyan3")
+vfci_color <- paletteer_d("ggthemes::excel_Ion")[1] # colors[1]
+fig_width <- 5.5 # in inches
+fig_height <- fig_width / 1.618 # in inches
 base::load(file = here::here("variables.RData"))
+
+## Declare Custom GGplot elements (theme, date breaks, etc) for plots
+update_geom_defaults("line", list(linewidth = 0.8)) ## Default is 0.5
+
+custom_theme <-
+  theme_classic(base_size = 11) + ## Base font size, ggplot2 defaults to 11
+  theme(
+    legend.title = element_blank(),
+    legend.background = element_blank(),
+    legend.direction = "vertical",
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    axis.line = element_blank(),
+    axis.text.x = element_text(margin = margin(5, 0, 0, 0, unit = "pt")),
+    axis.text.y = element_text(margin = margin(0, 5, 0, 0, unit = "pt"))
+  )
+
+custom_zero_line <-
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25)
+
+custom_date_breaks <-
+  as.yearqtr(seq(as.Date("1960-01-01"), as.Date("2020-01-01"), by = "10 years"))
+
+custom_scale_dates <-
+  tsibble::scale_x_yearquarter(
+    name = NULL,
+    date_labels = "%Y Q%q",
+    breaks = custom_date_breaks
+  )
+
+custom_legend_position <- c(0.2, 0.875)
 
 ## Standardized FCI ---------------------------------------
 # pick dates, variables
@@ -18,77 +48,63 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::select(yr,qtr, nfci,gsfci,vixcls, vfci) %>%
-  tsibble::as_tsibble() %>% 
-  tsibble::filter_index(date_begin ~ date_end) 
+  dplyr::select(yr, qtr, nfci, gsfci, vixcls, vfci) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
 
-tibble::add_column(variables_fig, vfci_new = (variables_fig %>%  select(yr,qtr, nfci,gsfci,vixcls, vfci)) )
+tibble::add_column(variables_fig, vfci_new = (variables_fig %>% select(yr, qtr, nfci, gsfci, vixcls, vfci)))
 
-p <- ggplot(variables_fig, aes(qtr)) + 
-  geom_line(aes(y=scale(nfci),colour="NFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(gsfci),colour="GSFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vixcls),colour="VIX"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,alpha=0.2,size=1.75) +
+p <- ggplot(variables_fig, aes(qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(nfci), colour = "NFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(gsfci), colour = "GSFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vixcls), colour = "VIX"), na.rm = FALSE) +
   ylab("Normalized index") +
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  ) +
-  theme_classic() +
+  custom_scale_dates +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = "inside",
-    legend.position.inside = c(0.25, 0.93),
-    legend.direction="horizontal",
-    legend.location = "plot",
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14),
-    axis.title.y = element_text(size = 14)
-  ) + 
-  scale_color_manual(breaks = c("NFCI","GSFCI","VIX","VFCI"),
-                     values=c(colors[1:2],colors[4], "black"),
-                     labels=c("NFCI","GSFCI","VIX","VFCI"))+
-  ylim(-2,6)
-p %>% print
+    legend.position = c(0.3, 0.9),
+    legend.direction = "horizontal"
+  ) +
+  scale_color_manual(
+    breaks = c("NFCI", "GSFCI", "VIX", "VFCI"),
+    values = c(colors[1:2], colors[4], "gray80"),
+    labels = c("NFCI", "GSFCI", "VIX", "VFCI")
+  ) +
+  ylim(-2, 6)
 
-fname <- here::here(paste0(output_dir,"FCI_std.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p,base_width = fig_width, base_height = fig_height)
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "FCI_std.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 ##  Figure. VFCI ----------------------------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::select(yr,qtr, vfci) %>%
-  tsibble::as_tsibble() %>% 
+  dplyr::select(yr, qtr, vfci) %>%
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
-p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25)  +
-  scale_fill_hue(l=40) +
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  ) +
+p <-
+  ggplot(as.data.frame(variables_fig), aes(qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  custom_scale_dates +
   ylab("Normalized index") +
   ylim(-2, 5) +
-  theme_classic() +
+  custom_theme +
   theme(
-    axis.title.y = element_text(size = 14),
-    legend.position="none",
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
+    legend.position = "none"
   ) +
-  scale_color_manual(values=vfci_color)
-p %>% print
+  scale_color_manual(values = vfci_color)
 
-fname <- here::here(paste0(output_dir,"just_vfci.png"))
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "just_vfci.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 ## Conditional mean and variance --------------------------------
 date_begin <- "1960 Q1"
@@ -96,84 +112,67 @@ date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
   dplyr::select(yr, qtr, vfci, mu) %>%
-  tsibble::as_tsibble() %>% 
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
-p <- ggplot(as.data.frame(variables_fig), aes(x=vfci,y=mu)) +
-  geom_point(aes(color="Fitted values"),shape="diamond",size=3) +
-  geom_smooth(aes(color="OLS line"),method=lm, se=FALSE,linewidth=1) +
+p <- ggplot(as.data.frame(variables_fig), aes(x = vfci, y = mu)) +
+  custom_zero_line +
+  geom_vline(xintercept = 0, color = "black", linewidth = 0.25) + 
+  geom_point(aes(color = "Fitted values"), shape = "diamond", size = 3) +
+  geom_smooth(aes(color = "OLS line"), method = lm, se = FALSE, linewidth = 1) +
   ylab("Conditional mean of GDP growth") +
-  xlab('Conditional volatility of GDP growth (log)')  +
-  theme_classic() +
-  theme(
-    panel.border = element_rect(colour = "black", fill=NA, linewidth=0.5)
-  ) +
-  scale_color_manual(values=c("Azure4",vfci_color)) +
+  xlab("Conditional volatility of GDP growth (log)") +
+  scale_color_manual(values = c("Azure4", vfci_color)) +
   guides(color = guide_legend(
     override.aes = list(
-      shape = c(18,NA),
-      size=c(3,0)
+      shape = c(18, NA),
+      size = c(3, 0)
     )
-  )
-  ) +
+  )) +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.85,0.9),
-    legend.direction="vertical",
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14),
-    axis.title.y = element_text(size = 14),
-    axis.title.x = element_text(size = 14)
-  ) 
-p %>% print
+    legend.position = c(0.85, 0.85)
+  )
 
-fname <- here::here(paste0(output_dir,"musigma_gdp.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "musigma_gdp.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 
 ## GDP and PCE VFCI ---------------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-vfci_cons <- dplyr::select(results$fgr1.pcecc96$ts, c("qtr","vfci")) %>% dplyr::rename(vfci_pce = vfci)
+vfci_cons <- dplyr::select(results$fgr1.pcecc96$ts, c("qtr", "vfci")) %>% dplyr::rename(vfci_pce = vfci)
 
 variables_fig <- variables %>%
-  dplyr::inner_join(vfci_cons,by="qtr") %>%
-  dplyr::select(yr,qtr, vfci, vfci_pce) %>%
-  tsibble::as_tsibble() %>% 
-  tsibble::filter_index(date_begin ~ date_end) %>% 
-  dplyr::mutate(date=as.Date(qtr))
+  dplyr::inner_join(vfci_cons, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_pce) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end) %>%
+  dplyr::mutate(date = as.Date(qtr))
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vfci_pce),colour="PCE-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) +
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  )  +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_pce), colour = "PCE-VFCI"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
   ylab("Normalized index") +
-  theme_classic() +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.17,0.92),
-    legend.direction="vertical",
-    axis.title.y = element_text(size = 14),
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
-  )  +
-  ylim(-2,5) +
-  scale_color_manual(breaks = c("VFCI","PCE-VFCI"),
-                     values=c(vfci_color, colors[1]),
-                     labels=c("VFCI","Consumption-VFCI")
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 5) +
+  scale_color_manual(
+    breaks = c("VFCI", "PCE-VFCI"),
+    values = c(vfci_color, colors[1]),
+    labels = c("VFCI", "Consumption-VFCI")
   )
-p %>% print
+p %>% print()
 
-fname <- here::here(paste0(output_dir,"vfci_gdp_and_pce.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+fname <- here::here(paste0(output_dir, "vfci_gdp_and_pce.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 
 
@@ -182,169 +181,192 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::inner_join(results$vfci_ind, by="qtr") %>%
+  dplyr::inner_join(results$vfci_ind, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_ind) %>%
-  tsibble::as_tsibble() %>% 
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,linewidth=1.25) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
   geom_line(
-    aes(y=scale(vfci_ind),colour="Individual-VFCI"),
-            na.rm=FALSE,linetype="longdash",linewidth=1.25
+    aes(y = scale(vfci_ind), colour = "Individual-VFCI"),
+    na.rm = FALSE, linetype = "longdash"
   ) +
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  ) +
+  custom_scale_dates +
   ylab("Normalized index") +
-  theme_classic() +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.25,0.9),
-    legend.direction="vertical",
-    axis.title.y = element_text(size = 14),
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
-  )  +
+    legend.position = custom_legend_position
+  ) +
   ylim(-2, 6) +
-  scale_color_manual(breaks = c("VFCI","Individual-VFCI"),
-                     values=c(vfci_color, colors[5]),
-                     labels=c("VFCI","VFCI using all financial variables")
+  scale_color_manual(
+    breaks = c("VFCI", "Individual-VFCI"),
+    values = c(vfci_color, colors[5]),
+    labels = c("VFCI", "VFCI using all financial variables")
   )
-p %>% print
-    
-fname <- here::here(paste0(output_dir,"vfci_gdp_and_indiv.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_gdp_and_indiv.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 ## US and EA VFCI ----------------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-variables_fig  <- variables %>%
-  dplyr::left_join(results$vfci_ea, by="qtr") %>%
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_ea, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_ea) %>%
-  tsibble::as_tsibble() %>% 
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vfci_ea),colour="EA-VFCI"),na.rm=FALSE,linetype="longdash",size=1.25) + 
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  )  +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_ea), colour = "EA-VFCI"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
   ylab("Normalized index") +
-  theme_classic() +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.18,0.9),
-    legend.direction="vertical",
-    axis.title.y = element_text(size = 14),
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
-  )  +
+    legend.position = custom_legend_position
+  ) +
   ylim(-2, 5) +
-  scale_color_manual(breaks = c("VFCI","EA-VFCI"),
-                     values=c(vfci_color, colors[2]),#c("blue","red"),
-                     labels=c("VFCI United States","VFCI Euro Area")
+  scale_color_manual(
+    breaks = c("VFCI", "EA-VFCI"),
+    values = c(vfci_color, colors[2]), # c("blue","red"),
+    labels = c("VFCI United States", "VFCI Euro Area")
   )
-p %>% print
+p %>% print()
 
-fname <- here::here(paste0(output_dir,"us_ea_vfci.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+fname <- here::here(paste0(output_dir, "us_ea_vfci.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
 
 ## VFCI and VFCI-Yields ----------------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-variables_fig  <- variables %>%
-  dplyr::left_join(results$vfci_yields, by="qtr") %>%
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_yields, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_yields) %>%
-  tsibble::as_tsibble() %>% 
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vfci_yields),colour="VFCI-Yields"),na.rm=FALSE,linetype="longdash",size=1.25) + 
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  )  +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_yields), colour = "VFCI-Yields"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
   ylab("Normalized index") +
-  theme_classic() +
+  custom_scale_dates +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.18,0.9),
-    legend.direction="vertical",
-    axis.title.y = element_text(size = 14),
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
-  )  +
+    legend.position = custom_legend_position
+  ) +
   ylim(-2, 5) +
-  scale_color_manual(breaks = c("VFCI","VFCI-Yields"),
-                     values=c(vfci_color, colors[6]),
-                     labels=c("VFCI","VFCI with Yields")
+  scale_color_manual(
+    breaks = c("VFCI", "VFCI-Yields"),
+    values = c(vfci_color, colors[6]),
+    labels = c("VFCI", "VFCI with Yields")
   )
-p %>% print
+p %>% print()
 
-fname <- here::here(paste0(output_dir,"vfci_yields.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+fname <- here::here(paste0(output_dir, "vfci_yields.svg"))
+ggsave(fname, width = fig_width, height = fig_height)
 
 
 
 ## VFCI and Lags ----------------------------------------------
+## VFCI and Lags in mean --------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-variables_fig  <- variables %>%
-  dplyr::left_join(results$vfci_lags$ts, by="qtr") %>%
-  dplyr::left_join(results$vfci_lags_in_mean$ts, by="qtr") %>%
-  dplyr::left_join(results$vfci_lags_in_vol$ts, by="qtr") %>%
-  dplyr::select(yr, qtr, vfci, vfci_lags, vfci_lags_in_mean, vfci_lags_in_vol) %>%
-  tsibble::as_tsibble() %>% 
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_lags_in_mean$ts, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_lags_in_mean) %>%
+  tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
-  geom_line(aes(y=scale(vfci),colour="VFCI"),na.rm=FALSE,size=1.25) +
-  geom_line(aes(y=scale(vfci_lags),colour="VFCI-lags"),na.rm=FALSE,linetype="longdash",size=1.25) + 
-  geom_line(aes(y=scale(vfci_lags_in_mean),colour="VFCI-lags-in-mean"),na.rm=FALSE,linetype="dashed",size=1.25) + 
-  geom_line(aes(y=scale(vfci_lags_in_vol),colour="VFCI-lags-in-vol"),na.rm=FALSE,linetype="dotdash",size=1.25) + 
-  tsibble::scale_x_yearquarter(
-    name = "",
-    date_labels="%Y-q%q",
-    breaks = variables_fig$qtr[seq(1, length(variables_fig$qtr), 40)]
-  )  +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_lags_in_mean), colour = "VFCI-lags-in-mean"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
   ylab("Normalized index") +
-  theme_classic() +
-  guides(color=guide_legend(ncol=2)) +
+  custom_theme +
   theme(
-    legend.title=element_blank(),
-    legend.position = c(0.33,0.9),
-    legend.direction="vertical",
-    axis.title.y = element_text(size = 14),
-    panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-    axis.text = element_text(size = 14),
-    legend.text = element_text(size = 14)
-  )  +
+    legend.position = custom_legend_position
+  ) +
   ylim(-2, 5) +
-  scale_color_manual(breaks = c("VFCI","VFCI-lags","VFCI-lags-in-mean","VFCI-lags-in-vol"),
-                     values=c(vfci_color, "gray20","gray50", "gray80"),
-                     labels=c("VFCI", "VFCI with lags", "VFCI with lags in mean", "VFCI with lags in volatility")
+  scale_color_manual(
+    breaks = c("VFCI", "VFCI-lags-in-mean" ),
+    values = c(vfci_color, "gray50"),
+    labels = c("VFCI", "VFCI with lags in mean")
   )
-p %>% print
+p %>% print()
 
-fname <- here::here(paste0(output_dir,"vfci_lags.png"))
-#ggsave(fname, width = fig_width, height = fig_height)
-cowplot::save_plot(fname, p, base_width = fig_width, base_height = fig_height)
+fname <- here::here(paste0(output_dir, "vfci_lags_in_mean.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
 
+
+## VFCI and Lags in vol --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_lags_in_vol$ts, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_lags_in_vol) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_lags_in_vol), colour = "VFCI-lags-in-vol"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 5) +
+  scale_color_manual(
+    breaks = c("VFCI", "VFCI-lags-in-vol"),
+    values = c(vfci_color, "gray70"),
+    labels = c("VFCI", "VFCI with lags in volatility")
+  )
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_lags_in_vol.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+## VFCI and Lags in mean and vol --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_lags$ts, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_lags) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), colour = "VFCI"), na.rm = FALSE) +
+  geom_line(aes(y = scale(vfci_lags), colour = "VFCI-lags"), na.rm = FALSE, linetype = "longdash") +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 5) +
+  scale_color_manual(
+    breaks = c("VFCI", "VFCI-lags-in-vol"),
+    values = c(vfci_color, "gray20"),
+    labels = c("VFCI",  "VFCI with lags in volatility")
+  )
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_lags.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
