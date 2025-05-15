@@ -20,8 +20,10 @@ custom_theme <-
   theme(
     legend.title = element_blank(),
     legend.background = element_blank(),
+    legend.justification = c(0, 1),
     legend.direction = "vertical",
-    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    legend.text = element_text(margin = margin(0, 6, 0, 3)),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
     axis.line = element_blank(),
     axis.text.x = element_text(margin = margin(5, 0, 0, 0, unit = "pt")),
     axis.text.y = element_text(margin = margin(0, 5, 0, 0, unit = "pt"))
@@ -40,7 +42,7 @@ custom_scale_dates <-
     breaks = custom_date_breaks
   )
 
-custom_legend_position <- c(0.2, 0.875)
+custom_legend_position <- c(0.025, 0.975)
 
 ## Standardized FCI ---------------------------------------
 # pick dates, variables
@@ -64,7 +66,7 @@ p <- ggplot(variables_fig, aes(qtr)) +
   custom_scale_dates +
   custom_theme +
   theme(
-    legend.position = c(0.3, 0.9),
+    legend.position = custom_legend_position,
     legend.direction = "horizontal"
   ) +
   scale_color_manual(
@@ -131,7 +133,7 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = vfci, y = mu)) +
   )) +
   custom_theme +
   theme(
-    legend.position = c(0.85, 0.85)
+    legend.position = c(0.7, 0.9)
   )
 
 p %>% print()
@@ -300,7 +302,7 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
   ylim(-2, 5) +
   scale_color_manual(
     breaks = c("VFCI", "VFCI-lags-in-mean" ),
-    values = c(vfci_color, "gray50"),
+    values = c(vfci_color, "gray30"),
     labels = c("VFCI", "VFCI with lags in mean")
   )
 p %>% print()
@@ -362,9 +364,9 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
   ) +
   ylim(-2, 5) +
   scale_color_manual(
-    breaks = c("VFCI", "VFCI-lags-in-vol"),
-    values = c(vfci_color, "gray20"),
-    labels = c("VFCI",  "VFCI with lags in volatility")
+    breaks = c("VFCI", "VFCI-lags"),
+    values = c(vfci_color, "gray50"),
+    labels = c("VFCI",  "VFCI with lags")
   )
 p %>% print()
 

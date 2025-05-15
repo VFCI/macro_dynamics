@@ -276,7 +276,7 @@
 <polygon points='177.89,84.41 181.44,80.86 185.00,84.41 181.44,87.97 ' style='stroke-width: 0.71; stroke: none; fill: #838B8B;' />
 <polygon points='183.44,82.93 186.99,79.38 190.55,82.93 186.99,86.49 ' style='stroke-width: 0.71; stroke: none; fill: #838B8B;' />
 <polyline points='57.30,15.60 61.31,17.51 65.33,19.43 69.35,21.34 73.36,23.25 77.38,25.16 81.40,27.08 85.42,28.99 89.43,30.90 93.45,32.81 97.47,34.73 101.48,36.64 105.50,38.55 109.52,40.46 113.54,42.37 117.55,44.29 121.57,46.20 125.59,48.11 129.61,50.02 133.62,51.94 137.64,53.85 141.66,55.76 145.67,57.67 149.69,59.59 153.71,61.50 157.73,63.41 161.74,65.32 165.76,67.24 169.78,69.15 173.79,71.06 177.81,72.97 181.83,74.89 185.85,76.80 189.86,78.71 193.88,80.62 197.90,82.54 201.91,84.45 205.93,86.36 209.95,88.27 213.97,90.19 217.98,92.10 222.00,94.01 226.02,95.92 230.03,97.83 234.05,99.75 238.07,101.66 242.09,103.57 246.10,105.48 250.12,107.40 254.14,109.31 258.15,111.22 262.17,113.13 266.19,115.05 270.21,116.96 274.22,118.87 278.24,120.78 282.26,122.70 286.27,124.61 290.29,126.52 294.31,128.43 298.33,130.35 302.34,132.26 306.36,134.17 310.38,136.08 314.40,138.00 318.41,139.91 322.43,141.82 326.45,143.73 330.46,145.65 334.48,147.56 338.50,149.47 342.52,151.38 346.53,153.30 350.55,155.21 354.57,157.12 358.58,159.03 362.60,160.94 366.62,162.86 370.64,164.77 374.65,166.68 ' style='stroke-width: 2.13; stroke: #B01513; stroke-linecap: butt;' />
-<rect x='41.43' y='5.48' width='349.09' height='204.74' style='stroke-width: 1.07;' />
+<rect x='41.43' y='5.48' width='349.09' height='204.74' style='stroke-width: 2.13;' />
 </g>
 <g clip-path='url(#cpMC4wMHwzOTYuMDB8MC4wMHwyNDQuNzU=)'>
 <text x='33.71' y='182.07' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-1.0</text>
@@ -299,11 +299,11 @@
 <text x='334.25' y='224.25' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.0</text>
 <text x='215.97' y='236.83' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='197.45px' lengthAdjust='spacingAndGlyphs'>Conditional volatility of GDP growth (log)</text>
 <text transform='translate(13.37,107.85) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='160.80px' lengthAdjust='spacingAndGlyphs'>Conditional mean of GDP growth</text>
-<rect x='301.84' y='18.91' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<polygon points='306.92,27.55 310.48,24.00 314.04,27.55 310.48,31.11 ' style='stroke-width: 0.71; stroke: none; fill: #838B8B;' />
-<rect x='301.84' y='36.19' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='303.57' y1='44.83' x2='317.39' y2='44.83' style='stroke-width: 2.13; stroke: #B01513; stroke-linecap: butt;' />
-<text x='324.60' y='30.70' style='font-size: 8.80px; font-family: "Arial";' textLength='49.87px' lengthAdjust='spacingAndGlyphs'>Fitted values</text>
-<text x='324.60' y='47.98' style='font-size: 8.80px; font-family: "Arial";' textLength='33.74px' lengthAdjust='spacingAndGlyphs'>OLS line</text>
+<rect x='291.27' y='31.43' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<polygon points='296.36,40.07 299.91,36.52 303.47,40.07 299.91,43.63 ' style='stroke-width: 0.71; stroke: none; fill: #838B8B;' />
+<rect x='291.27' y='48.71' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='293.00' y1='57.35' x2='306.82' y2='57.35' style='stroke-width: 2.13; stroke: #B01513; stroke-linecap: butt;' />
+<text x='311.54' y='43.23' style='font-size: 8.80px; font-family: "Arial";' textLength='49.87px' lengthAdjust='spacingAndGlyphs'>Fitted values</text>
+<text x='311.54' y='60.51' style='font-size: 8.80px; font-family: "Arial";' textLength='33.74px' lengthAdjust='spacingAndGlyphs'>OLS line</text>
 </g>
 </svg>
