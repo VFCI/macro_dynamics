@@ -23,6 +23,8 @@ The folder `output/baseline/` has the figures and tables in [The Market Price of
 
 This project uses the R package [renv](https://rstudio.github.io/renv/articles/renv.html) for package version control. Running `main.R` automatically reinstantiates the project with the correct packages, but this can also be done manually with `renv::restore()`.
 
+`renv` also records the version of R used, but does not enforce that specific version of R is used.  In order to install older versions of R, consider using [rig](https://github.com/r-lib/rig).
+
 #### GSL Requirement
 Some of the R packages require that the numerical C and C++ library `gsl` is installed on your system.
 Please install [gsl](https://www.gnu.org/software/gsl/) if it is not already.
