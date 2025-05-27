@@ -52,7 +52,7 @@ chol_sf_res_vfci[,3:dim(chol_sf_res_vfci)[2]] <- scale(chol_sf_res_vfci[,3:dim(c
 # Local Projections
 # Local projections do not have a ``structural representation" they only serve to estimate the impulse response
 # function under minimal assumptions 
-# https://www.frbsf.org/wp-content/uploads/sites/4/wp2023-16.pdf 
+# https://www.frbsf.org/wp-content/uploads/sites/4/wp2023-16.pdf
 
 #---------------------------------------
 # Sign-restricted VAR
@@ -125,8 +125,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","bvar_shock_corr",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","bvar_shock_corr",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
@@ -145,8 +145,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","rf_res_corr",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","rf_res_corr",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
@@ -165,8 +165,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_ff",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_ff",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
@@ -185,8 +185,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_vfci",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_vfci",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
@@ -206,8 +206,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_p",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_p",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
@@ -227,8 +227,8 @@ rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
 
-corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_y",'.pdf', sep = ''))
-pdf(corr_plot, width = 4, height = 4)
+corr_plot <- here::here(paste0("output/appendix/figures/","sf_all_models_corr_y",'.svg', sep = ''))
+svg(corr_plot, width = 4, height = 4)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 corrplot(mcor, method = "shade", shade.col = NA, tl.col = "black", tl.srt = 45, diag = TRUE,
          type = "lower", col = col(200), addCoef.col = "black", cl.pos = "n")
