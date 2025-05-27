@@ -159,7 +159,7 @@ if (avg_regime == 1) {
 	      shocknames = shock_names,
 	      filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
 	      blocks = blocks,
-	      width = 6, height = 8)
+	      width = 6, height = 7)
 	  }
 
 } else if (avg_regime == 0) {

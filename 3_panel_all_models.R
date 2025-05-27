@@ -18,18 +18,20 @@ base::load(filename_iv)
 
 # Color of plots (don't change this)
 if (vfci_pair == "ff") {
-  color <- rgb(1,0,.5,0.2) #Pink IRF shade
+  color <- "#ff78d4" # Pink IRF shade
 } else {
-  color <- rgb(0,0,1,0.2)  #Blue IRF shade
+  color <- "#6666fe"  # Blue IRF shade
 }
 
 #-------------------------------------------------------------------------------
 # II. This section generalizes the code to capture either the FF or Y IRFs
 #      For baseline as well as for robustness
+fig_width <- 5
 
 if (vfci_pair == "ff") {
-  col1 <- "Fed Funds shock to VFCI"
-  col2 <- "VFCI shock to Fed Funds" 
+  fig_height <- 7
+  col1 <- "Fed Funds Shock to VFCI"
+  col2 <- "VFCI Shock to Fed Funds" 
   vol_bvar_second_var <- "Fed Funds"
   vol_bvar_type_vfci <- var_names[3]
   GDP_FF_FOR_IV <- "fedfunds"
@@ -48,8 +50,9 @@ if (vfci_pair == "ff") {
         lp_data_vfci_shock <- c("ygr", "infl_pce", "fedfunds", "vfci_lev")
       }
   } else {
-  col1 <- "Output shock to VFCI"
-  col2 <- "VFCI shock to Output" 
+  fig_height <- 5.5
+  col1 <- "Output Shock to VFCI"
+  col2 <- "VFCI Shock to Output" 
   vol_bvar_second_var <- var_names[1] #GDP
   vol_bvar_type_vfci <- var_names[3]
   GDP_FF_FOR_IV <- "lgdp"
@@ -201,11 +204,13 @@ plot_df <-
     lp_df1,
     lp_df2,
     chol_df1,
-    chol_df2,
-    sr_df,
-    sr_df2
+    chol_df2
   ) |>
   purrr::list_rbind()
+
+if (vfci_pair == "ff") {
+  plot_df <- purrr::list_rbind(list(plot_df, sr_df, sr_df2))
+}
 
 model_order <- c("Vol-BVAR", "SVAR-IV", "LP-IV", "Cholesky", "Sign Restriction")
 plot_df$model <- factor(plot_df$model, levels = model_order, ordered = TRUE)
@@ -217,7 +222,7 @@ p <-
     y = response
   )) +
   geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
-  geom_line(color = color) +
+  geom_line(color = "black") +
   geom_ribbon(aes(ymin = response.lower, ymax = response.upper), alpha = 0.25, fill = color) +
   geom_ribbon(aes(ymin = `response.lower.68`, ymax = `response.upper.68`), alpha = 0.5, fill = color) +
   scale_x_continuous(expand = c(0,0)) +
@@ -245,5 +250,5 @@ p <-
     strip.text.y.left = element_text(angle = 90),
     panel.spacing = unit(10, "pt")
   )
-  
-ggsave(fname, p, width = 5, height = 7)
+
+ggsave(fname, p, width = fig_width, height = fig_height)

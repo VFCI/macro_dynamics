@@ -56,7 +56,7 @@ impulseplots = function(ir, ## array of impulse response objects, nvar x nshock 
             y = irf
         )) +
         geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
-        geom_line(color = color) +
+        geom_line(color = "black") +
         geom_ribbon(aes(ymin = irf_lb2, ymax = irf_ub2), alpha = 0.25, fill = color) +
         geom_ribbon(aes(ymin = irf_lb1, ymax = irf_ub1), alpha = 0.5, fill = color) +
         scale_x_continuous(expand = c(0,0)) + 
