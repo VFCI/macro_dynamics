@@ -77,10 +77,10 @@ p_iv_int_vfci <-
   ggplot(aes(
     x = horizon
   )) +
+  geom_line(aes(y = response), color = "black") +
   geom_hline(yintercept = 0, color = "black", linewidth = 0.25) + 
   geom_ribbon(aes(ymin = response.lower, ymax = response.upper), fill = colors[6], alpha = 0.25) +
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
-  geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
   scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = NULL) +
@@ -107,10 +107,10 @@ p_chol_ext_vfci <-
   ggplot(aes(
     x = horizon
   )) +
+  geom_line(aes(y = response), color = "black") +
   geom_hline(yintercept = 0, color = "black", linewidth = 0.25) + 
   geom_ribbon(aes(ymin = response.lower, ymax = response.upper), fill = colors[6], alpha = 0.25) +
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
-  geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
   scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = "External VFCI") +
@@ -135,10 +135,10 @@ p_chol_int_vfci_last <-
   ggplot(aes(
     x = horizon
   )) +
+  geom_line(aes(y = response), color = "black") +
   geom_hline(yintercept = 0, color = "black", linewidth = 0.25) + 
   geom_ribbon(aes(ymin = response.lower, ymax = response.upper), fill = colors[6], alpha = 0.25) +
   geom_ribbon(aes(ymin = response.lower.68, ymax = response.upper.68), fill = colors[6], alpha = 0.5) +
-  geom_line(aes(y = response), color = colors[6]) +
   facet_wrap(vars(target), ncol = 1, scales = "free_y") +
   scale_x_continuous(limits = c(0, 19), breaks = seq(4, 19, 5), labels = seq(5, 20, 5), expand = c(0,0)) + 
   labs(x = NULL, y = NULL, title = "Internal VFCI") +
