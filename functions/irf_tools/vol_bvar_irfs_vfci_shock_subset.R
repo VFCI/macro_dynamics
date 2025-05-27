@@ -6,12 +6,12 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
                         sstruct = "TO", ## set to TO if you want var to be the shocked var; FROM for a response var
                         #filename = 'impulse_plot',
                         filename = '',
-                        format = 'pdf', #'pdf',
+                        format = 'svg', #'pdf',
                         addtitle = FALSE, ## put a big title on the top?
                         nsteps = NULL, ## number of steps to use
                         varnames = rep('',dim(ir)[1]), ## names of the response variables
                         ptype = 'Impulse response', ## part of the title in some cases
-                        color = c(0, 0, 1), ## base color (default blue)
+                        color = c(0, 0, 1), ## base color, rgb (default blue)
                         alpha = c(0.5,0.3), ## how much alpha for each oonf band color
                         gr = 0.7, ## what shade of grey
                         width = 5, ## inches
@@ -26,33 +26,14 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
 ) {
 
   ###################################################################################
-  require(grDevices)
-  if (format == 'pdf'){ ## different methods for the "light color" for pdf and eps
-    if(sum(is.na(color))==0){
-        shades = rgb(color[1],color[2],color[3], alpha)
-    } else {
-        shades = c(NA,NA,NA,NA)
-    }
-  } else if (format == 'eps'){
-    trellis.device(device="postscript", color = TRUE)
-    #setEPS()
-    ## postscript(filename, width = width, height = height)
-    
-    alphafy = function(col,alpha=1) {
-      rr = 1-alpha*(1-c(col/255))
-      return(rgb(rr[1],rr[2],rr[3]))
-    }
-    color = alphafy(color, alpha)
-  } 
-  if (is.null(xtick)){
-    xtick = seq(0,nsteps,by=5)
-  }
-  
+
+  fname = paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"), ".", format) 
+  color = rgb(color[1], color[2], color[3])
+
   ##
   ## Calculating the IR quantiles and
   ## y limits for plots
   ##
-  #browser()
   nv = dim(ir)[1] ## variables
   ns = dim(ir)[2] ## shocks
   
@@ -93,28 +74,6 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
   }
   
    numplots <- length(findvar)
-   # DETERMINE DIMENSIONS OF PLOTS
-   if((numplots %% 2) > 0){
-     sizeplot1 <- floor(numplots/2) + 1
-     sizeplot2 <- floor(numplots/2)
-   } else {
-     sizeplot1 <- numplots/2 -> sizeplot2
-   }
-
-  if(newplot == TRUE){
-    fname = paste(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.pdf', sep = '') 
-    if (format == 'pdf'){ 
-      pdf(fname, width = width, height = height)
-    } else if (format == 'eps'){
-      trellis.device(device="postscript", color = TRUE)
-      postscript(fname,width=width,height=height)        
-    }
-    
-    par(mfrow = c(sizeplot1,sizeplot2),
-    col.lab="black",col.main="black",
-    #oma=c(1,5,1,2), mar=c(.5,.25,.5,.25), tcl=-0.1, mgp=c(3,1,0)) #to change the plot margins
-    oma=c(0,5,1,2), mar=c(4,.25,.5,4), tcl=-0.1, mgp=c(3,1,0)) #to change the plot margins
-  }
   
 
   if(sstruct=="TO"){
@@ -126,111 +85,60 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
   plotleftax <- 1
   irout <- c()
   namesirout <- c()
-  for (j in findvar){ ## responses
 
-      ptitle = ifelse(sstruct=="TO",paste(varnames[varind],"shock to",varnames[j],sep=" "),
-                      paste(varnames[j],"shock to",varnames[varind],sep=" "))## name of data series
-      if (sum(unlist(lapply(yaxis_vfci_shock,is.na))) > 0){
-      plot(irnew[j,],
-           ylim = response_ylim[j,],
-           type = 'l',
-           lwd = 2,
-           xlab = '',
-           ylab = '',
-           yaxt  = 'n',
-           xaxt = 'n',
-           col  = "blue4",
-           ## fg = gray(gr),
-           xlim = c(1,nsteps), xaxs = 'i')
-        ytick = pretty(response_ylim[j,],4)
+  plot_list <- lapply(findvar, function(j) { ## responses
+
+      ptitle = ifelse(
+        sstruct=="TO",
+        paste(varnames[varind],"shock to",varnames[j],sep=" "),
+        paste(varnames[j],"shock to",varnames[varind],sep=" ") ## name of data series
+      )
+
+      if(sstruct == "TO"){
+        irf_bands_1 <- cbind(irq[j,varind,,1], irq[j,varind,,3])
+        irf_bands_2 <- cbind(irq[j,varind,,2], irq[j,varind,,4])
       } else {
-        plot(irnew[j,],
-             ylim = y_axis_custom[[j]], 
-             type = 'l',
-             lwd = 2,
-             xlab = '',
-             ylab = '',
-             yaxt  = 'n',
-             xaxt = 'n',
-             col  = "blue4",
-             ## fg = gray(gr),
-             xlim = c(1,nsteps), xaxs = 'i')
-        ytick = pretty(y_axis_custom[[j]],4)
+        irf_bands_1 <- cbind(irq[varind,j,,1], irq[varind,j,,3])
+        irf_bands_2 <- cbind(irq[varind,j,,2], irq[varind,j,,4])
       }
-      
-      
-      
-      
-      #abline(h = ytick, lty = 'blank')## ,col=gray(gr))
-      #abline(v = xtick, lty = 'blank') ## ,col=gray(gr))
-      abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-      abline(v = xtick, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-      
-      abline(a=0,b=0,lwd=0.75)
-      irout <- cbind(irout,irnew[j,])
-      namesirout <- c(namesirout,paste0("ir_",gsub(" ","_",ptitle)))
-                     
-      if (!is.null(nconf)){ ## plot confidence bands
-        for (ic in 1:nconf){
-          if(sstruct == "TO"){
-            polygon(c(1:nsteps, nsteps:1),
-                    c(irq[j,varind,,ic],rev(irq[j,varind,,ic+nconf])),
-                    col = ifelse(sum(is.na(color)) == 0,shades[ic],NA),
-                    border = NA, #"lightgray"
-                    lty = 2,
-                    lwd = 2)
-            irout <- cbind(irout,irq[j,varind,,ic],irq[j,varind,,ic+nconf])
-          } else {
-            polygon(c(1:nsteps, nsteps:1),
-                    c(irq[varind,j,,ic],rev(irq[varind,j,,ic+nconf])),
-                    col = ifelse(sum(is.na(color)) == 0,shades[ic],NA),
-                    border = NA,
-                    lty = 2,
-                    lwd = 2)
-            irout <- cbind(irout,irq[varind,j,,ic],irq[varind,j,,ic+nconf])
-          }
-          namesirout <- c(namesirout,paste0("ir_",gsub(" ","_",ptitle),"_",conf[ic],"_lb"),
-                          paste0("ir_",gsub(" ","_",ptitle),"_",conf[ic],"_ub"))  
-        }
-      }
-      
-      # ##Adding variable name and axis on leftmost plot
-      if(sizeplot2 > 0){
-        if ((plotleftax %% sizeplot2)>0){
-        #     mtext(ptitle, side = 2, line = 5, cex = 0.5, las = 1, adj = 0)
-         axis(side = 2, cex.axis = 1.3, las = 1,at=ytick)
-        }
-      } 
-      
-      if(plotyaxis == TRUE){
-        axis(side = 2, cex.axis = 1.3, las = 1,at=ytick)
-      }
-      ## ##Right side axis labels on right most plot
-      ## if (sv == blocks[[ib]]$y[length(blocks[[ib]]$y)]){
-      ##     axis(side = 4, cex.axis = .75, las = 1)
-      ## }
-      
-      if(plottitle == TRUE)
-          mtext(ptitle, side = 3, line = 0, cex = 1.3)
-      
-      axis(side = 1,cex.axis = 1,las = 1,at =xtick) #adds quarters 1-t to the x-axis
-      plotleftax <- plotleftax + 1
-  }
-  if (addtitle){
-    bigtitle = paste(type, 'over', as.character(nSteps), 'periods', sep = ' ')
-    title(bigtitle, outer = TRUE, cex = 1.3)
-  }
- 
-  if(newplot == TRUE){
-    #dev.copy(x11)              # copy the content of the pdf device into the x11 device
-    #dev.set(which = 2)         # set the pdf device as actice
-    dev.off()
-  }
+
+      p <- ggplot() + 
+      geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+      geom_ribbon(aes(x = seq_len(nsteps), ymin = irf_bands_2[,1], ymax = irf_bands_2[,2]), alpha = alpha[1], fill = color) +
+      geom_ribbon(aes(x = seq_len(nsteps), ymin = irf_bands_1[,1], ymax = irf_bands_2[,2]), alpha = alpha[2], fill = color) +
+      geom_line(aes(x = seq_len(nsteps), y = irnew[j,]), color = color) +
+      scale_x_continuous(limits = c(1,nsteps), expand = c(0, 0)) + 
+      scale_y_continuous(limits = c(y_axis_custom[[j]]), expand = c(0, 0)) +
+      labs(
+        title = ptitle,
+        x = NULL,
+        y = NULL
+      ) +
+      theme_classic(base_size = 11) + ## Base font size, ggplot2 defaults to 11
+      theme(
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        legend.justification = c(0, 1),
+        legend.direction = "vertical",
+        legend.text = element_text(margin = margin(0, 6, 0, 3)),
+        panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
+        axis.line = element_blank(),
+        axis.text.x = element_text(margin = margin(5, 0, 0, 0, unit = "pt")),
+        axis.text.y = element_text(margin = margin(0, 5, 0, 0, unit = "pt"))
+      )
+    irout <- cbind(irnew[j,], irf_bands_1, irf_bands_2)
+    colnames(irout) <- paste0(paste0("ir_",gsub(" ","_",ptitle)), c("", paste0(c("_lb", "_ub"), conf[1]), paste0(c("_lb", "_ub"), conf[2])))
+    
+    return(p)
+  })
+
+  p <- patchwork::wrap_plots(plot_list)
+
+  ggsave(fname, p, width = width, height = height, units = "in")
   
-  #Save CSV Spreadsheet
-  if(savedata == TRUE){
-    colnames(irout) <- namesirout
-    write.table(irout,file=paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.csv') 
-                  ,col.names = TRUE,row.names = FALSE,sep=",")
+  if (savedata == TRUE) {
+    write.table(irout,file=paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.csv'),col.names = TRUE,row.names = FALSE,sep=",")
   }
 }
+

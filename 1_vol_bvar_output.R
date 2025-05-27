@@ -96,7 +96,7 @@ if (avg_regime == 1) {
 		    blocks = blocks,
 		    filename = paste(filename_overleaf,'_vd',sep=''),
 		    varnames = var_names,
-		    width = 8, height = 5,nsteps = 20)
+		    width = 8, height = 5,nsteps = 20,ylims = c(0,1))
 
 
  } else if (length(vars == 5)) {

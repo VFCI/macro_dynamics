@@ -18,9 +18,9 @@ base::load(filename_iv)
 
 # Color of plots (don't change this)
 if (vfci_pair == "ff") {
-  rgb_col <<- rgb(1,0,.5,0.2) #Pink IRF shade (global var since exported to another script)
+  color <- rgb(1,0,.5,0.2) #Pink IRF shade
 } else {
-  rgb_col <<- rgb(0,0,1,0.2)  #Blue IRF shade (global var since exported to another script)
+  color <- rgb(0,0,1,0.2)  #Blue IRF shade
 }
 
 #-------------------------------------------------------------------------------
@@ -73,229 +73,177 @@ if (vfci_pair == "ff") {
   }
 
 #-------------------------------------------------------------------------------
-
-# III. Export panel to pdf or visualize in plot window
-export_pdf <- 1                  ##### CONFIG 4 #####
-
-if (export_pdf == 1) {
-  if (type == "baseline") {
-    fname <- here::here(paste0("output/baseline/figures/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
-  } else {
-    fname <- here::here(paste0("output/appendix/figures/",vfci_pair,'-vfci-',type,'.pdf', sep = ''))
-  }
-  if (vfci_pair == "ff") {
-      pdf(fname, width = 8, height = 11)
-  } else {
-      pdf(fname, width = 8, height = 11*(4/5))
-  }
+if (type == "baseline") {
+  fname <- here::here(paste0("output/baseline/figures/",vfci_pair,'-vfci-',type,'.svg', sep = ''))
+} else {
+  fname <- here::here(paste0("output/appendix/figures/",vfci_pair,'-vfci-',type,'.svg', sep = ''))
 }
 
 #-------------------------------------------------------------------------------
+## Gather Dataset for plotting
 
-# IV. Plot layout
-# Don't change anything in this section
-if (vfci_pair == "ff") {
-layout.mat <- matrix(seq(1,5*3,1),
-                     nrow = 5, ncol = 3,
-                     byrow = TRUE)
-} else {
-  layout.mat <- matrix(seq(1,4*3,1),
-                       nrow = 4, ncol = 3,
-                       byrow = TRUE)
-}
+irdraws <- ir$ir[,,,1,]
+irf <- apply(ir$ir[,,,1,],c(1:3),median)
+nsteps <- irf_steps
+irf  = irf[,,1:nsteps]
+conf <- c(.68, .90)
 
-layout(mat = layout.mat,widths = c(1,2.5,2.5))
-par(col.lab="black",col.main="black", 
-    mar=c(2,1,2,4), oma=c(1,1,1,1), tcl=0.1, mgp=c(3,1,0))
+## 
+irq = apply(irdraws[,,1:nsteps,],1:3,quantile,
+  ##probs = c(rev((1 - conf) / 2), .5 + conf/2))
+  probs = c((1-conf)/2,0.5 + conf/2))
+irq = aperm(irq,perm=c(2,3,4,1))
 
-xticks <- seq(1,20,1) #Limit for plots so they are in the same scale
-x_tick_same <- c(1,5,10,15,20)
-xlimff <- c(min(xticks),max(xticks))
+dimnames(irf)[[1]] <- var_names
+dimnames(irf)[[2]] <- var_names
+dimnames(irf)[[3]] <- 1:20
+df <- as.data.frame.table(irf) |> dplyr::as_tibble()
+colnames(df) <- c("target", "shock", "horizon", "response")
 
-#--------------------------------------------------------------------
-#Model 1: Vol-BVAR
-#--------------------------------------------------------------------
+dimnames(irq)[[1]] <- var_names
+dimnames(irq)[[2]] <- var_names
+dimnames(irq)[[3]] <- 1:20
+dimnames(irq)[[4]] <- c("lower.68", "lower", "upper.68", "upper")
+dfq <- as.data.frame.table(irq) |> dplyr::as_tibble()
+colnames(dfq) <- c("target", "shock", "horizon", "quantile", "response")
 
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-mtext("Vol-BVAR", side = 3, line = 0, cex = .85,col="blue4",at = 0.25)
+dfq_wide <- dfq |> tidyr::pivot_wider(names_from = quantile, values_from = response, names_prefix = "response.")
 
-impulseplots_panel(
-  ir = apply(ir$ir[,,,1,],c(1:3),median),
-  irdraws = ir$ir[,,,1,],
-  varind = which(var_names == vol_bvar_type_vfci), ## Index of the variable for which the plot is specified
-  findvar = which(var_names == vol_bvar_second_var), ##Shock
-  conf = c(.68,.90), ## what confidence bands to put on the plot
-  sstruct = "FROM",
-  color = NA, ##Color of IRFs
-  nsteps = irf_steps,
-  varnames = var_names,
-  savedata = FALSE,newplot =FALSE,plotyaxis = TRUE,plottitle = FALSE)
-mtext(col1, side = 3, line = 0, cex = 1.1)
+df <- dplyr::full_join(df, dfq_wide, by = c("target", "shock", "horizon"))
 
-impulseplots_panel(
-  ir = apply(ir$ir[,,,1,],c(1:3),median),
-  irdraws = ir$ir[,,,1,],
-  varind = which(var_names == vol_bvar_second_var), ## Index of the variable for which the plot is specified
-  findvar = which(var_names == vol_bvar_type_vfci),
-  conf = c(.68,.90), ## what confidence bands to put on the plot
-  sstruct = "FROM",
-  color = NA, ##Color of IRFs
-  nsteps = irf_steps,
-  varnames = var_names,
-  savedata = FALSE,newplot =FALSE,plotyaxis = TRUE,plottitle = FALSE)
-mtext(col2, side = 3, line = 0, cex = 1.1)
+df$horizon <- as.numeric(df$horizon)
+df$model <- "Vol-BVAR"
 
+bvar_df1 <- df |> filter(target == vol_bvar_type_vfci & shock == vol_bvar_second_var)
+bvar_df2 <- df |> filter(target == vol_bvar_second_var & shock == vol_bvar_type_vfci)
 
-#--------------------------------------------------------------------
-#Model 2: SVAR-IV
-#--------------------------------------------------------------------
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-mtext("SVAR-IV", side = 3, line = 0, cex = .85,col="blue4",at = 0.25)
+## SVAR output as df
+svar_df1 <- SVAR_GDP_OR_FF[SVAR_GDP_OR_FF$target == vfci_type,]
+svar_df1$target <- vol_bvar_type_vfci
+svar_df1$shock <- vol_bvar_second_var
+svar_df1$model <- "SVAR-IV"
+svar_df1$horizon <- svar_df1$horizon + 1
 
-ylimff <- c(min(SVAR_GDP_OR_FF$response.lower[SVAR_GDP_OR_FF$target == vfci_type])
-            ,max(SVAR_GDP_OR_FF$response.upper[SVAR_GDP_OR_FF$target == vfci_type]))
-ytick <- pretty(ylimff,4)
-plot(xticks,SVAR_GDP_OR_FF$response[SVAR_GDP_OR_FF$target == vfci_type],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimff)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-lines(xticks,SVAR_GDP_OR_FF$response.upper[SVAR_GDP_OR_FF$target == vfci_type],col=NA,lty=2,lwd=2)
-lines(xticks,SVAR_GDP_OR_FF$response.lower[SVAR_GDP_OR_FF$target == vfci_type],col=NA,lty=2,lwd=2)
-polygon(c(xticks, rev(xticks)), c(SVAR_GDP_OR_FF$response.lower[SVAR_GDP_OR_FF$target == vfci_type],
-      rev(SVAR_GDP_OR_FF$response.upper[SVAR_GDP_OR_FF$target == vfci_type])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)), c(SVAR_GDP_OR_FF$response.lower.68[SVAR_GDP_OR_FF$target == vfci_type],
-                                  rev(SVAR_GDP_OR_FF$response.upper.68[SVAR_GDP_OR_FF$target == vfci_type])), col=rgb_col,border=NA)
+svar_df2 <- df_irf_vfci[df_irf_vfci$target == GDP_FF_FOR_IV,]
+svar_df2$target <- vol_bvar_second_var 
+svar_df2$shock <- vol_bvar_type_vfci
+svar_df2$model <- "SVAR-IV"
+svar_df2$horizon <- svar_df2$horizon + 1
 
-ylimvfci <- c(min(df_irf_vfci$response.lower[df_irf_vfci$target == GDP_FF_FOR_IV])
-              ,max(df_irf_vfci$response.upper[df_irf_vfci$target == GDP_FF_FOR_IV]))
-ytick <- pretty(ylimvfci,4)
-plot(xticks,df_irf_vfci$response[df_irf_vfci$target == GDP_FF_FOR_IV],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimvfci)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-lines(xticks,df_irf_vfci$response.upper[df_irf_vfci$target == GDP_FF_FOR_IV],col=NA,lty=2,lwd=2)
-lines(xticks,df_irf_vfci$response.lower[df_irf_vfci$target == GDP_FF_FOR_IV],col=NA,lty=2,lwd=2)
-polygon(c(xticks, rev(xticks)), c(df_irf_vfci$response.lower[df_irf_vfci$target == GDP_FF_FOR_IV],
-                                  rev(df_irf_vfci$response.upper[df_irf_vfci$target == GDP_FF_FOR_IV])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)), c(df_irf_vfci$response.lower.68[df_irf_vfci$target == GDP_FF_FOR_IV],
-                                  rev(df_irf_vfci$response.upper.68[df_irf_vfci$target == GDP_FF_FOR_IV])), col=rgb_col,border=NA)
+## LP output to DF
+lp_df1 <- data.frame(
+  horizon = 1:20,
+  target = vol_bvar_type_vfci,
+  shock = vol_bvar_second_var,
+  response = LP_GDP_OR_FF$irf_lin_mean[3,],
+  response.lower = LP_GDP_OR_FF$irf_lin_low[3,],
+  response.upper = LP_GDP_OR_FF$irf_lin_up[3,],
+  response.lower.68 = LP_GDP_OR_FF$irf_lin_low.68[3,],
+  response.upper.68 = LP_GDP_OR_FF$irf_lin_up.68[3,],
+  model = "LP-IV"
+)
+lp_df2 <- data.frame(
+  horizon = 1:20,
+  target = vol_bvar_second_var,
+  shock = vol_bvar_type_vfci,
+  response = results_lin_iv_vfci$irf_lin_mean[3,],
+  response.lower = results_lin_iv_vfci$irf_lin_low[3,],
+  response.upper = results_lin_iv_vfci$irf_lin_up[3,],
+  response.lower.68 = results_lin_iv_vfci$irf_lin_low.68[3,],
+  response.upper.68 = results_lin_iv_vfci$irf_lin_up.68[3,],
+  model = "LP-IV"
+)
 
-#--------------------------------------------------------------------
-#Model 3: LP-IV
-#--------------------------------------------------------------------
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-mtext("LP-IV", side = 3, line = 0, cex = .85,col="blue4",at = 0.25)
+## Cholesky Output as DF
+chol_df1 <- CHOL_GDP_OR_FF[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL,]
+chol_df1$target <- vol_bvar_type_vfci
+chol_df1$shock <- vol_bvar_second_var
+chol_df1$model <- "Cholesky"
+chol_df1$horizon <- chol_df1$horizon + 1
 
-ylimff <- c(min(LP_GDP_OR_FF$irf_lin_low[3,])
-            ,max(LP_GDP_OR_FF$irf_lin_up[3,]))
-ytick <- pretty(ylimff,4)
-plot(xticks,LP_GDP_OR_FF$irf_lin_mean[3,],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimff)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-lines(xticks,LP_GDP_OR_FF$irf_lin_up[3,],col=NA,lty=2,lwd=2)
-lines(xticks,LP_GDP_OR_FF$irf_lin_low[3,],col=NA,lty=2,lwd=2)
-polygon(c(xticks, rev(xticks)), c(LP_GDP_OR_FF$irf_lin_low[3,], rev(LP_GDP_OR_FF$irf_lin_up[3,])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)), c(LP_GDP_OR_FF$irf_lin_low.68[3,], rev(LP_GDP_OR_FF$irf_lin_up.68[3,])), col=rgb_col,border=NA)
+chol_df2 <- chol_irf_vfci[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type, ]
+chol_df2$target <- vol_bvar_second_var 
+chol_df2$shock <- vol_bvar_type_vfci
+chol_df2$model <- "Cholesky"
+chol_df2$horizon <- chol_df2$horizon + 1
 
+## Sign Restrictions as DF
+sr_df <- data.frame(
+  horizon = 1:20,
+  target = vol_bvar_type_vfci,
+  shock = vol_bvar_second_var,
+  response = apply(irfs_mp[, ,3],2,median),
+  response.lower = apply(irfs_mp[, ,3],2,function(x) quantile(x,0.05)),
+  response.upper = apply(irfs_mp[, ,3],2,function(x) quantile(x,0.95)),
+  response.lower.68 = apply(irfs_mp[, ,3],2,function(x) quantile(x,0.16)),
+  response.upper.68 = apply(irfs_mp[, ,3],2,function(x) quantile(x,0.84)),
+  model = "Sign Restriction"
+)
+sr_df2 <- data.frame(
+  horizon = 1:20,
+  target = vol_bvar_second_var,
+  shock = vol_bvar_type_vfci,
+  response = apply(irfs_vfci[, ,4],2,median),
+  response.lower = apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.05)),
+  response.upper = apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.95)),
+  response.lower.68 = apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.16)),
+  response.upper.68 = apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.84)),
+  model = "Sign Restriction"
+)
 
-ylimvfci <- c(min(results_lin_iv_vfci$irf_lin_low[lp_vfci_shock_on,])
-              ,max(results_lin_iv_vfci$irf_lin_up[lp_vfci_shock_on,]))
-ytick <- pretty(ylimvfci,4)
-plot(xticks,results_lin_iv_vfci$irf_lin_mean[lp_vfci_shock_on,],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimvfci)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-lines(xticks,results_lin_iv_vfci$irf_lin_up[lp_vfci_shock_on,],col=NA,lty=2,lwd=2)
-lines(xticks,results_lin_iv_vfci$irf_lin_low[lp_vfci_shock_on,],col=NA,lty=2,lwd=2)
-polygon(c(xticks, rev(xticks)),c(results_lin_iv_vfci$irf_lin_low[lp_vfci_shock_on,], rev(results_lin_iv_vfci$irf_lin_up[lp_vfci_shock_on,])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)),c(results_lin_iv_vfci$irf_lin_low.68[lp_vfci_shock_on,], rev(results_lin_iv_vfci$irf_lin_up.68[lp_vfci_shock_on,])), col=rgb_col,border=NA)
+## Combine all DFs
+plot_df <-
+  list(
+    bvar_df1,
+    bvar_df2,
+    svar_df1,
+    svar_df2,
+    lp_df1,
+    lp_df2,
+    chol_df1,
+    chol_df2,
+    sr_df,
+    sr_df2
+  ) |>
+  purrr::list_rbind()
 
+model_order <- c("Vol-BVAR", "SVAR-IV", "LP-IV", "Cholesky", "Sign Restriction")
+plot_df$model <- factor(plot_df$model, levels = model_order, ordered = TRUE)
 
-#--------------------------------------------------------------------
-#Model 4: Cholesky 
-#--------------------------------------------------------------------
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-mtext("Cholesky", side = 3, line = 0, cex = .85,col="blue4",at = 0.25)
-
-ylimff <- c(min(CHOL_GDP_OR_FF$response.lower[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL])
-            ,max(CHOL_GDP_OR_FF$response.upper[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL]))
-ytick <- pretty(ylimff,4)
-plot(xticks,CHOL_GDP_OR_FF$response[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimff)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-polygon(c(xticks, rev(xticks)),c(CHOL_GDP_OR_FF$response.lower[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL],
-                                 rev(CHOL_GDP_OR_FF$response.upper[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)),c(CHOL_GDP_OR_FF$response.lower.68[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL],
-                                 rev(CHOL_GDP_OR_FF$response.upper.68[CHOL_GDP_OR_FF$target == vfci_type & CHOL_GDP_OR_FF$shock == GDP_FF_FOR_CHOL])), col=rgb_col,border=NA)
-
-
-ylimvfci <- c(min(chol_irf_vfci$response.lower[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type])
-              ,max(chol_irf_vfci$response.upper[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type]))
-ytick <- pretty(ylimvfci,4)
-plot(xticks,chol_irf_vfci$response[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type],type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimvfci)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at = ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at =c(1,5,10,15,20))
-polygon(c(xticks, rev(xticks)),c(chol_irf_vfci$response.upper[chol_irf_vfci$target == GDP_FF_FOR_CHOL& chol_irf_vfci$shock == vfci_type],
-                                 rev(chol_irf_vfci$response.lower[chol_irf_vfci$target == GDP_FF_FOR_CHOL& chol_irf_vfci$shock == vfci_type])), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)),c(chol_irf_vfci$response.upper.68[chol_irf_vfci$target == GDP_FF_FOR_CHOL& chol_irf_vfci$shock == vfci_type],
-                                 rev(chol_irf_vfci$response.lower.68[chol_irf_vfci$target == GDP_FF_FOR_CHOL& chol_irf_vfci$shock == vfci_type])), col=rgb_col,border=NA)
-
-#--------------------------------------------------------------------
-#Model 5: Sign Restrictions 
-#--------------------------------------------------------------------
-
-if (vfci_pair == "ff") {
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-mtext("Sign Restr", side = 3, line = 0, cex = .85,col="blue4",at = 0.25)
-
-ylimff <- c(min(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.05)))
-            ,max(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.95))))
-ytick <- pretty(ylimff,4)
-plot(xticks,apply(irfs_mp[, ,3],2,median),type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = range(ytick))
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at = c(1,5,10,15,20))
-polygon(c(xticks, rev(xticks)), c(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.16)), rev(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.84)))), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)), c(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.05)), rev(apply(irfs_mp[, ,3],2,function(x) quantile(x,0.95)))), col=rgb_col,border=NA)
-
-ylimvfci <- c(min(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.05)))
-              ,max(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.95))))
-ytick <- pretty(ylimvfci,4)
-plot(xticks,apply(irfs_vfci[, ,4],2,median),type='l',col= "blue4",lty= 1,lwd = 2,
-     xlab = '',ylab = '',yaxt  = 'n',xaxt = 'n',xlim = xlimff, xaxs = 'i',ylim = ylimvfci)
-abline(h = ytick, lty = 'dotted', col = "lightgray")## ,col=gray(gr))
-abline(v = x_tick_same, lty = 'dotted', col = "lightgray") ## ,col=gray(gr))
-abline(a=0,b=0,lwd=0.75)
-axis(side = 2, cex.axis = 1.25, las = 1,at=ytick)
-axis(side = 1,cex.axis = 1.25,las = 1,at = c(1,5,10,15,20))
-polygon(c(xticks, rev(xticks)), c(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.16)),rev(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.84)))), col=rgb_col,border=NA)
-polygon(c(xticks, rev(xticks)), c(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.05)),rev(apply(irfs_vfci[, ,4],2,function(x) quantile(x,0.95)))), col=rgb_col,border=NA)
-}
-
-if (export_pdf == 1) {
-  dev.off()
-}
+p <-
+  plot_df |>
+  ggplot(aes(
+    x = horizon,
+    y = response
+  )) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+  geom_line(color = color) +
+  geom_ribbon(aes(ymin = response.lower, ymax = response.upper), alpha = 0.25, fill = color) +
+  geom_ribbon(aes(ymin = `response.lower.68`, ymax = `response.upper.68`), alpha = 0.5, fill = color) +
+  scale_x_continuous(expand = c(0,0)) +
+  ggh4x::facet_grid2(rows = vars(model), cols = vars(paste0(shock, " shock to ", target)), switch = "y", scales = "free_y", independent = "y") +
+  theme_classic(base_size = 11) + ## Base font size, ggplot2 defaults to 11
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank(),
+    legend.background = element_blank(),
+    legend.justification = c(0, 1),
+    legend.direction = "vertical",
+    legend.text = element_text(margin = margin(0, 6, 0, 3)),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
+    axis.line = element_blank(),
+    axis.text.x = element_text(margin = margin(5, 0, 0, 0, unit = "pt")),
+    axis.text.y = element_text(margin = margin(0, 5, 0, 0, unit = "pt"))
+  ) +
+  theme(
+    strip.placement = "outside",
+    strip.background = element_blank(),
+    strip.text.y.left = element_text(angle = 90),
+    panel.spacing = unit(10, "pt")
+  )
+  
+ggsave(fname, p, width = 5, height = 7)
