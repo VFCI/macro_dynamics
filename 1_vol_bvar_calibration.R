@@ -33,8 +33,8 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   
 } else if (type == "vfci_lev") {
   vars_in_system <- c('lgdp', 'lpce', 'vfci_lev','fedfunds') 
-  var_names      <- c("Log Real GDP", "Log Core PCE", " Exponential VFCI", "Fed Funds")
-  shock_names    <- c("Real GDP shock", "Core PCE shock", "Exponential VFCI shock", "Fed Funds shock")
+  var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(-0.01,0.002),c(-0.005,0.005),c(-0.04,0.2),c(-0.5,0.05))
   yaxis_vfci_response  <- list(c(-0.1,0.1),c(-0.1,0.1),c(-0.05,0.2),c(-0.05,0.15))
   
