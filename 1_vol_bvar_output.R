@@ -117,7 +117,7 @@ if (avg_regime == 1) {
      nsteps = irf_steps,
      varnames = var_names,
      filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
-     format = 'pdf',#'r_plot',
+     format = 'svg',#'r_plot',
      width = 9, height = 7,savedata = FALSE,newplot = TRUE)
    
    #--------------------------------------------------
@@ -189,7 +189,7 @@ if (avg_regime == 1) {
       nsteps = irf_steps,
       varnames = var_names,
       filename = paste('output/appendix/figures/irplot_all_shocks','_reg_',r,sep=''),
-      format = 'pdf',#'r_plot',
+      format = 'svg',#'r_plot',
       width = 9, height = 7,savedata = FALSE,newplot = TRUE)
     
   #------------------------------------------------------

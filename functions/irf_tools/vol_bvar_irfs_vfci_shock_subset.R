@@ -106,7 +106,7 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
       geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
       geom_line(aes(x = seq_len(nsteps), y = irnew[j,]), color = "black") +
       geom_ribbon(aes(x = seq_len(nsteps), ymin = irf_bands_2[,1], ymax = irf_bands_2[,2]), alpha = alpha[1], fill = color) +
-      geom_ribbon(aes(x = seq_len(nsteps), ymin = irf_bands_1[,1], ymax = irf_bands_2[,2]), alpha = alpha[2], fill = color) +
+      geom_ribbon(aes(x = seq_len(nsteps), ymin = irf_bands_1[,1], ymax = irf_bands_1[,2]), alpha = alpha[2], fill = color) +
       scale_x_continuous(limits = c(1,nsteps), expand = c(0, 0)) + 
       scale_y_continuous(limits = c(y_axis_custom[[j]]), expand = c(0, 0)) +
       labs(
