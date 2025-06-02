@@ -1,3 +1,6 @@
+fig_width <- 5 # in inches
+fig_height <- fig_width / 1.618
+
 #-------------------------------------------------------------------------------
 # Relative variances per regime (for baseline model)
 #-------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ if (avg_regime == 1) {
           nsteps = irf_steps,
           varnames = var_names,
           filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
-          width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+          width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
         
         #--------------------------------------------------
         #VFCI response
@@ -78,7 +81,7 @@ if (avg_regime == 1) {
           nsteps = irf_steps,
           varnames = var_names,
           filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
-          width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+          width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
    
 		## VARIANCE DECOMPOSITION
 	    vd <- ir$ir[,,,1,]
@@ -118,7 +121,7 @@ if (avg_regime == 1) {
      varnames = var_names,
      filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
      format = 'svg',#'r_plot',
-     width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+     width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
    
    #--------------------------------------------------
    #VFCI response [horserace]
@@ -135,7 +138,7 @@ if (avg_regime == 1) {
      nsteps = irf_steps,
      varnames = var_names,
      filename = paste(filename_overleaf,'_irplot_all_shocks',sep=''),
-     width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+     width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
  }
 
 #--------------------------------------------------
@@ -190,7 +193,7 @@ if (avg_regime == 1) {
       varnames = var_names,
       filename = paste('output/appendix/figures/irplot_all_shocks','_reg_',r,sep=''),
       format = 'svg',#'r_plot',
-      width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+      width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
     
   #------------------------------------------------------
   # VFCI response [regime-specific]
@@ -208,7 +211,7 @@ if (avg_regime == 1) {
       nsteps = irf_steps,
       varnames = var_names,
       filename = paste('output/appendix/figures/irplot_all_shocks','_reg',r,sep=''),
-      width = 9, height = 7,savedata = FALSE,newplot = TRUE)
+      width = fig_width, height = fig_height,savedata = FALSE,newplot = TRUE)
     
      print(r)
 
