@@ -101,7 +101,7 @@ impulseplots_panel <- function(ir, ## array of impulse response objects, nvar x 
    }
 
   if(newplot == TRUE){
-    fname = paste(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.pdf', sep = '') 
+    fname = paste(filename,'_',gsub("\\s+", "_", varnames[varind]),'_',ifelse(sstruct=="TO","shock","response"),'.pdf', sep = '') 
     if (format == 'pdf'){ 
       pdf(fname, width = width, height = height)
     } else if (format == 'eps'){
@@ -208,7 +208,7 @@ impulseplots_panel <- function(ir, ## array of impulse response objects, nvar x 
   #Save CSV Spreadsheet
   if(savedata == TRUE){
     colnames(irout) <- namesirout
-    write.table(irout,file=paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.csv') 
+    write.table(irout,file=paste0(filename,'_',gsub("\\s+", "_", varnames[varind]),'_',ifelse(sstruct=="TO","shock","response"),'.csv') 
                   ,col.names = TRUE,row.names = FALSE,sep=",")
   }
 }

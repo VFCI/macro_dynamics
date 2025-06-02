@@ -2,8 +2,11 @@
 # 1. Specifying the data input into the BVAR and IRFs
 #-------------------------------------------------------------------------------
 
+fig_width <- 5 # in inches
+fig_height <- fig_width / 1.618
+
 #Variables
-if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
+if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M" | grepl("mn", type)) {
   vars_in_system <- c('lgdp','lpce','vfci','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "VFCI shock", "Fed Funds shock")
@@ -100,7 +103,21 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M") {
   shock_names    <- c("Real GDP shock", "Core PCE shock","GZ shock", "TEDR shock", "Fed Funds shock")
   yaxis_vfci_shock    <- list(c(-0.015,0.002),c(-0.005,0.005),c(-0.1,0.3),c(-0.1,0.3),c(-0.5,0.05))
   yaxis_vfci_response <- list(c(-0.1,0.1),c(-0.06,0.06),c(-0.1,0.3),c(-0.1,0.3),c(-0.15,0.15)) 
-  
+
+} else if (type == "total_log_vol") {
+  vars_in_system <- c('lgdp','lpce','total_log_vol','fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "Tot LV", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "Total Log Vol shock", "Fed Funds shock")
+  yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
+  yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
+  fig_height = 5
+} else if (type == "resid_log_vol") {
+  vars_in_system <- c('lgdp','lpce','resid_log_vol','fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "Res LV", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "Resid Log Vol shock", "Fed Funds shock")
+  yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
+  yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
+  fig_height = 5
 }
 
 input_in_var <- as.data.frame(vfci_data[, c("date", vars_in_system)])
@@ -167,6 +184,17 @@ nlags_calibration     <- 4
 
 mn_tight_calib <- 3
 mn_decay_calib <- 0.5
+
+if (type == "mn_tight_low") {
+  mn_tight_calib <- 1
+} else if (type == "mn_tight_high") {
+  mn_tight_calib <- 5
+} else if (type == "mn_decay_low") {
+  mn_decay_calib <- 0.25
+} else if (type == "mn_decay_high") {
+  mn_decay_calib <- 0.75
+}
+
 
 #-------------------------------------------------------------------------------
 #4. Calibration for MCMC algorithm

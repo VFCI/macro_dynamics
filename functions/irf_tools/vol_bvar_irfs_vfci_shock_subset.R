@@ -27,7 +27,7 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
 
   ###################################################################################
 
-  fname = paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"), ".", format) 
+  fname = paste0(filename,'_',gsub("\\s+", "_", varnames[varind]),'_',ifelse(sstruct=="TO","shock","response"), ".", format) 
   color = rgb(color[1], color[2], color[3])
 
   ##
@@ -138,7 +138,7 @@ impulseplots_subset <- function(ir, ## array of impulse response objects, nvar x
   ggsave(fname, p, width = width, height = height, units = "in")
   
   if (savedata == TRUE) {
-    write.table(irout,file=paste0(filename,'_',varnames[varind],'_',ifelse(sstruct=="TO","shock","response"),'.csv'),col.names = TRUE,row.names = FALSE,sep=",")
+    write.table(irout,file=paste0(filename,'_',gsub("\\s+", "_", varnames[varind]),'_',ifelse(sstruct=="TO","shock","response"),'.csv'),col.names = TRUE,row.names = FALSE,sep=",")
   }
 }
 
