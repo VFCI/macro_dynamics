@@ -58,7 +58,8 @@ get_vfci <- function(data,y,x,het=x,prcomp=TRUE,n_prcomp = 4, date_begin="1962 Q
       ts = dplyr::bind_cols(h$pc_ts,
                             tibble::tibble(qtr = data$qtr,
                                            vfci=log(attr(h$residuals, "std")),
-                                           mu=unname(h$fitted))),
+                                           mu=unname(h$fitted),
+                                           epsilon=h$residuals)),
       hetreg = h,
       call = Call
     )

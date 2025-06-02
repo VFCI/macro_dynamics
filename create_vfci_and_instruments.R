@@ -433,6 +433,11 @@ results$vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,
 results$vfci_ea <- get_vfci(variables,"fgr1.clvmnacscab1gqea19",c("ciss"),prcomp=FALSE,n_prcomp = 4,date_begin="1995 Q1", date_end="2022 Q2")$ts %>% 
   rename(vfci_ea = vfci, mu_ea=mu)
 
+## Try different number of PCs in the estimation
+results_pcs <- 1:6 %>% 
+  purrr::set_names() %>% 
+  purrr::map(~get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=TRUE,n_prcomp = .,date_begin=date_begin, date_end=date_end))
+
 
 vfci_baseline <- results$fgr1.gdpc1 #results$vfci_lags_in_mean
 # vfci_baseline$ts <- vfci_baseline$ts %>% 
@@ -449,6 +454,11 @@ variables <- purrr::reduce(
   dplyr::inner_join, 
   by = "qtr"
 )
+
+variables <-
+  variables |>
+  dplyr::mutate(total_log_vol = log(epsilon^2) / 2) |>
+  dplyr::mutate(resid_log_vol = total_log_vol - vfci)
 
 ## Need to use the PC calculated above to estimate the following VFCI robustness
 pcs <- paste0("pc", 1:4)

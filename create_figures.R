@@ -372,3 +372,103 @@ p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_lags.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
+
+
+## VFCI with all PCs --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- results_pcs |>
+  purrr::map(~ .x$ts) |>
+  purrr::list_rbind(names_to = "pc") |>
+  dplyr::mutate(pc = as.numeric(pc)) |>
+  dplyr::group_by(pc) |>
+  dplyr::mutate(vfci_scaled = scale(vfci)) |>
+  ungroup()
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = vfci_scaled, color = as.factor(pc))) +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 6) +
+  scale_color_manual(
+    values = c("#dadaeb", "#bcbddc", "#9e9ac8", vfci_color, "#756bb1", "#4a1486"),
+    labels = 1:6,
+    name = "PCs"
+  )
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_pcs.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+
+## VFCI with some PCs --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- results_pcs |>
+  purrr::map(~ .x$ts) |>
+  purrr::list_rbind(names_to = "pc") |>
+  dplyr::mutate(pc = as.numeric(pc)) |>
+  dplyr::group_by(pc) |>
+  dplyr::mutate(vfci_scaled = scale(vfci)) |>
+  ungroup() |>
+  dplyr::filter(pc %in% 3:5)
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = vfci_scaled, color = as.factor(pc))) +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 6) +
+  scale_color_manual(
+    values = c("#9e9ac8", vfci_color, "#756bb1" ),
+    labels = 3:5,
+    name = "PCs"
+  )
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_some_pcs.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+
+## VFCI compared to total and residual log vol --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::select(qtr, vfci, total_log_vol, resid_log_vol) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), color = "VFCI")) +
+  geom_line(aes(y = scale(total_log_vol), color = "Total Log Vol")) +
+  geom_line(aes(y = scale(resid_log_vol), color = "Residual Log Vol"))+
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-4, 5) +
+  scale_color_manual(
+    values = c(vfci_color, "#41b6c4", "#c7e9b4"),
+    labels = c("VFCI", "Total Log Vol", "Residual Log Vol"),
+    breaks = c("VFCI", "Total Log Vol", "Residual Log Vol")
+  )
+p %>% print()
+
+fname <- here::here(paste0(output_dir, "vfci_total_and_resid_vol.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
