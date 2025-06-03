@@ -110,14 +110,12 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M" | 
   shock_names    <- c("Real GDP shock", "Core PCE shock", "Total Log Vol shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
   yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
-  fig_height = 5
 } else if (type == "resid_log_vol") {
   vars_in_system <- c('lgdp','lpce','resid_log_vol','fedfunds') 
   var_names      <- c("Log Real GDP", "Log Core PCE", "Res LV", "Fed Funds")
   shock_names    <- c("Real GDP shock", "Core PCE shock", "Resid Log Vol shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
   yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
-  fig_height = 5
 }
 
 input_in_var <- as.data.frame(vfci_data[, c("date", vars_in_system)])
