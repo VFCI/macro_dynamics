@@ -120,3 +120,29 @@ for (i in vol_bvar_robustness_c) {
   source('1_vol_bvar_output.R')
 }
 
+## Robustness
+# 16. Replace VFCI with Total Log Vol
+# 17. Replace VFCI with Residual Log Vol
+
+vol_bvar_robustness_d <- c("total_log_vol", "resid_log_vol")
+for (i in vol_bvar_robustness_d) {
+  type = i
+  source('1_vol_bvar_calibration.R')
+  source('1_vol_bvar_estimation.R')
+  source('1_vol_bvar_output.R')
+}
+
+## Robustness
+# 18. Baseline, but lower minnesota tightness parameter
+# 19. Baseline, but higher minnesota tightness parameter
+# 20. Baseline, but lower minnesota decay parameter
+# 21. Baseline, but higher minnesota decay parameter
+
+
+vol_bvar_robustness_e <- c("mn_tight_low", "mn_tight_med", "mn_tight_high", "mn_decay_low", "mn_decay_high")
+for (i in vol_bvar_robustness_e) {
+  type = i
+  source('1_vol_bvar_calibration.R')
+  source('1_vol_bvar_estimation.R')
+  source('1_vol_bvar_output.R')
+}
