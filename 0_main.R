@@ -35,6 +35,9 @@ if(type  == "baseline"){
   source("3_create_residual_mat.R")
 }
 
+## Test if the residual shocks are normally distributed
+source("test_for_normality.R")
+
 ### Panel: All models ----------------------------------------------------------
 ff_y <- c("ff", "y")
 for (i in ff_y) {
