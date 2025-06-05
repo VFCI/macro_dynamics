@@ -185,12 +185,14 @@ mn_decay_calib <- 0.5
 
 if (type == "mn_tight_low") {
   mn_tight_calib <- 1
+} else if (type == "mn_tight_med") {
+  mn_tight_calib <- 2
 } else if (type == "mn_tight_high") {
   mn_tight_calib <- 5
 } else if (type == "mn_decay_low") {
-  mn_decay_calib <- 0.25
+  mn_decay_calib <- 0.3
 } else if (type == "mn_decay_high") {
-  mn_decay_calib <- 0.75
+  mn_decay_calib <- 0.7
 }
 
 
