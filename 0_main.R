@@ -49,6 +49,10 @@ source('4_internal_vfci_var_output.R')
 
 source('4b_internal_vfci_var_figures.R')
 
+## MDD -------------------------------------------------------------------------
+source("calculate_mdd.R")
+
+
 # Robustness of the five identification schemes --------------------------------
 
 #Robustness
