@@ -23,8 +23,9 @@ startdate <- as.Date('1962-01-01')
 enddate   <- as.Date('2022-07-01')
 strTsigbrk  <- as.Date(c('1979-10-01','1983-01-01','1990-01-01','2008-01-01','2011-01-01', '2020-01-01'))
 
+load("./variables.RData")
 data_Y <- variables[, c("date", vars)]
-data_Y <- data_Y |> filter(date >= startdate & date <= enddate) |> select(-date)
+data_Y <- data_Y |> filter(date >= startdate & date <= enddate) |> dplyr::select(-date)
 data_Tsigbrk <- which(variables$date %in% strTsigbrk)
 Tsigbrk = c(nLags+1, data_Tsigbrk, dim(data_Y)[1]) # add the first and last points as well
 
@@ -46,9 +47,10 @@ mdd_rf <- mgnl
 
 ## Make a table
 df <- tibble(
-  `Variation in...` = md(c("None", "Structural shock variances", "Structural shock variances", "All of $A(L)$ and $A_0$")),
-  `Distribution` = c("Gaussian", "t", "Gaussian", "Gaussian"),
-  MDD = c(mdd_rf, mdd_t, mdd_n, mdd_tvA)
+  ` ` = c("Baseline", "", "", ""),
+  `Variation in...` = md(c( "Structural shock variances", "None", "Structural shock variances", "All of $A_0$ through $A_p$")),
+  `Distribution` = c( "t", "Gaussian", "Gaussian", "Gaussian"),
+  MDD = c( mdd_t, mdd_rf, mdd_n, mdd_tvA)
 )
 
 tb_latex <-
@@ -58,7 +60,7 @@ tb_latex <-
   cols_align(align = "left", columns = c(1,2)) |>
   as_latex() |>
   as.character() |>
-  str_replace_all("longtable", "tabular")
+  stringr::str_replace_all("longtable", "tabular")
 
 tb_latex |>
   writeLines("./output/baseline/tables/mdd.tex")
