@@ -378,13 +378,15 @@ ggsave(fname, p, width = fig_width, height = fig_height)
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-variables_fig <- results_pcs |>
+pcs_df <- results_pcs |>
   purrr::map(~ .x$ts) |>
   purrr::list_rbind(names_to = "pc") |>
   dplyr::mutate(pc = as.numeric(pc)) |>
   dplyr::group_by(pc) |>
   dplyr::mutate(vfci_scaled = scale(vfci)) |>
   ungroup()
+
+variables_fig <- pcs_df
 
 p <- ggplot(variables_fig, aes(x = qtr)) +
   custom_zero_line +
@@ -472,3 +474,41 @@ p %>% print()
 fname <- here::here(paste0(output_dir, "vfci_total_and_resid_vol.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
 
+
+## Figure Comparing all VFCI series
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_lags$ts, by = "qtr") %>%
+  dplyr::left_join(results$vfci_lags_in_vol$ts, by = "qtr") %>%
+  dplyr::left_join(results$vfci_lags_in_mean$ts, by = "qtr") %>%
+  dplyr::left_join(results$vfci_ea, by = "qtr") %>%
+  dplyr::left_join(results$vfci_ind, by = "qtr") %>%
+  dplyr::left_join(vfci_cons, by = "qtr") %>%
+  dplyr::select(qtr, vfci, vfci_lags, vfci_lags_in_vol, vfci_lags_in_mean, vfci_ea, vfci_lev, vfci_ind, vfci_pce, total_log_vol, resid_log_vol) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- 
+  variables_fig |>
+  pivot_longer(-c(qtr, vfci)) |>
+  group_by(name) |>
+  mutate(value_scaled = scale(value)) |>
+  ggplot(aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = vfci), color = vfci_color) +
+  geom_line(aes(y = value_scaled), color = "steelblue", alpha = 0.7) +
+  facet_grid(rows = vars(name), scales = "free_y") +
+  custom_scale_dates +
+  custom_theme +
+  labs(
+    y = "Normalized Index"
+  ) +
+  theme(
+    strip.background = element_blank(),
+    strip.text.y.right = element_text(angle = 0, hjust = 0, color = "steelblue"),
+    strip.placement = "outside"
+  )
+
+
+fname <- here::here(paste0(output_dir, "compare_vfci_time_series.svg"))
+ggsave(fname, p, width = 5.5, height = 7)
