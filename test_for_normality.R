@@ -1,13 +1,17 @@
 library(mvnormalTest)
 library(ggplot2)
 library(patchwork)
+library(gt)
+
+load('output/res_ins_data.Rdata') ## data_res
 
 # Non-normality of BVAR structural shocks and Q-Q plots
 shock_type <- grep("^sf_bvar", names(data_res), value = TRUE)
 vars_for_corr <- data_res %>% 
   filter(date>=(as.Date("1963-01-01"))) %>%
-  select(c(all_of(shock_type)))
-colnames(vars_for_corr) <- c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
+  dplyr::select(c(all_of(shock_type)))
+vars <-  c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds")
+colnames(vars_for_corr) <- vars
 rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
@@ -15,6 +19,24 @@ mcor <- round(mcor, digits = 2)
 
 #Mardia Test (Skewness and Kurtosis) for Multivariate Normality
 mardia_result <- mardia(vars_for_corr)
+
+# Mardia Test (Skewness and Kurtosis) for univariate normality
+mardia_list <- vars |> purrr::set_names() |> purrr::map(~ mardia(vars_for_corr[, .x]))
+
+mardia_list[[vars[[1]]]]$mv.test
+
+mardia_df  <- vars |>
+  purrr::set_names() |>
+  purrr::map(~
+    tibble(
+      Test = mardia_list[[.x]]$mv.test$Test,
+      Statistic = as.numeric(as.character(mardia_list[[.x]]$mv.test$Statistic)),
+      `p-value` = as.numeric(as.character(mardia_list[[.x]]$mv.test$`p-value`))
+    ) |>
+    dplyr::filter(Test != "MV Normality") |>
+    tidyr::pivot_longer(-Test)
+  ) |>
+  purrr::list_rbind(names_to = "Variable")
 
 ## Rotational Robust Shapiro-Wilk Type (SWT) Test for Multivariate Normality
 ## Note: also runs univariate Shapiro Wilk tests, which is what we report
@@ -28,21 +50,38 @@ cn <- fa_result$uv.shapiro |> colnames()
 dims <- c(length(rn), length(cn))
 vals <- fa_result$uv.shapiro |> as.character()
 data <- matrix(vals, nrow = dims[1], ncol = dims[2], dimnames = list(rn, cn))
-df <- data |> as.data.frame() |> tibble::rownames_to_column("Variable")
-df$W <- as.numeric(df$W)
-df$`p-value` <- as.numeric(df$`p-value`)
+sw_df <- data |> as.data.frame() |> tibble::rownames_to_column("Variable")
+sw_df$`Statistic` <- as.numeric(sw_df$W)
+sw_df$W <- NULL
+sw_df$`p-value` <- as.numeric(sw_df$`p-value`)
+sw_df$UV.Normality <- NULL
+sw_df <- sw_df |> tidyr::pivot_longer(-Variable)
+sw_df$Test <- "Normality"
+
+df <- list(
+  mardia_df |> mutate(model = "Mardia"),
+  sw_df |> mutate(model = "Shapiro-Wilks")
+) |>
+  purrr::list_rbind()
 
 ## Make table
 tb <-
   df |>
-  gt() |>
-  fmt_number(decimals = 3, columns = 2) |>
+  dplyr::arrange(model, Test, name) |>
+  tidyr::pivot_wider(names_from = c(model, Test, name), values_from = value, names_sep = "_") |>
+  gt(rowname_col = "Variable") |>
+  tab_spanner_delim(
+    delim = "_"
+  ) |>
+  fmt_number(decimals = 0, columns = c(2, 4)) |>
+    fmt_number(decimals = 2, columns = c(6)) |>
+  fmt_number(decimals = 4, columns = c(3, 5, 7), drop_trailing_zeros = TRUE) |>
   as_latex() |>
   as.character() |>
-  str_replace_all("longtable", "tabular")
+  stringr::str_replace_all("longtable", "tabular")
 
 tb |>
-  writeLines("./output/baseline/tables/SWtest.tex")
+  writeLines("./output/appendix/tables/SWtest.tex")
  
 #------
 
