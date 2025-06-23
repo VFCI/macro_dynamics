@@ -513,115 +513,7 @@ results$vfci_lags_in_vol$ts <- results$vfci_lags_in_vol$ts %>%
   )
 
 
-# Create instruments ------------------------------------------------------
-
-# Create data
-unc_bc_data <- variables
-unc_bc_data$vfci_lev <- exp(unc_bc_data$vfci)
-minDate <- as.Date(min(unc_bc_data$qtr))
-maxDate <- as.Date(max(unc_bc_data$qtr))
-unc_bc_data$DATE <- seq.Date(minDate,maxDate,by = 'quarter')
-minDate <- max(as.Date(min(unc_bc_data$qtr)),as.Date('1963-01-01'))
-maxDate <- min(as.Date(max(unc_bc_data$qtr)),as.Date('2022-07-01'))
-unc_bc_data <- subset(unc_bc_data, DATE>=minDate & DATE<=maxDate)
-
-## VFCI instrument (Baseline) ----------------------------------------------
-
-unc_bc_data_baseline <- unc_bc_data[, c("DATE","log.gdpc1","log.pcepilfe","vfci","fedfunds")]
-df_ts_baseline <- as.ts(x = unc_bc_data_baseline[, -1], order.by = unc_bc_data_baseline$DATE)
-constr_vfci_baseline <- c(+3,-2) #-2 is restriction on negative price level
-
-#Penalty function algorithm
-nlags <- 4
-sn_var_vfci <-uhlig.penalty(Y=df_ts_baseline, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
-                            KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
-shocks_penalty_baseline <- sn_var_vfci$SHOCKS
-ss_penalty <- ts(t(apply(shocks_penalty_baseline,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
-vfci_shock_penalty <- as.data.frame(ss_penalty[,1]) %>% setNames(c("vfci_shock_penalty"))
-vfci_shock_penalty$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
-
-#Rejection algorithm
-sn_var_vfci <- uhlig.reject(Y=df_ts_baseline, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
-                            KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
-shocks_reject_baseline <- sn_var_vfci$SHOCKS
-ss_reject <- ts(t(apply(shocks_reject_baseline,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
-vfci_shock_reject <- as.data.frame(ss_reject[,1]) %>% setNames(c("vfci_shock_reject"))
-vfci_shock_reject$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
-
-## VFCI instrument (VFCI in levels) ----------------------------------------
-unc_bc_data_levels <- unc_bc_data[, c("DATE", "log.gdpc1","log.pcepilfe", "vfci_lev", "fedfunds")]
-df_ts_levels <- as.ts(x = unc_bc_data_levels[, -1], order.by = unc_bc_data_levels$DATE)
-constr_vfci_baseline <- c(+3,-2) #-2 is restriction on negative price level
-sn_var_vfci_levels <-uhlig.penalty(Y=df_ts_levels, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
-                                   KMAX=6, constrained=constr_vfci_baseline, constant=FALSE, steps=20)
-shocks_levels <- sn_var_vfci_levels$SHOCKS
-ss_levels <- ts(t(apply(shocks_levels,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
-vfci_shock_penalty_vfci_in_levels <- as.data.frame(ss_levels[,1]) %>% setNames(c("vfci_shock_penalty_vfci_in_levels"))
-vfci_shock_penalty_vfci_in_levels$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
-
-## VFCI instrument (Stationary case) ---------------------------------------
-unc_bc_data_stationary <- unc_bc_data[, c("DATE", "gap", "gr4.pcepilfe", "vfci", "fedfunds")]
-df_ts_stationary <- as.ts(x = unc_bc_data_stationary[, -1], order.by = unc_bc_data_stationary$DATE)
-constr_vfci_stationary <- c(+3,-2) #-2 is restriction on negative price level
-sn_var_vfci_stationary <-uhlig.penalty(Y=df_ts_stationary, nlags=nlags, draws=5000, subdraws=200, nkeep=1000, KMIN=1,
-                                       KMAX=6, constrained=constr_vfci_stationary, constant=FALSE, steps=20)
-shocks_stationary <- sn_var_vfci_stationary$SHOCKS
-ss_stationary <- ts(t(apply(shocks_stationary,2,quantile,probs=c(0.5, 0.16, 0.84))), frequency=4, start=c(1963,1))
-vfci_shock_penalty_stationary_model <- as.data.frame(ss_stationary[,1]) %>% setNames(c("vfci_shock_penalty_stationary_model"))
-vfci_shock_penalty_stationary_model$date <- head(tsibble::yearquarter(seq.Date(minDate, maxDate, by = 'quarter')),n=-nlags)
-
-## Merge all instruments ---------------------------------------------------
-instruments_vfci <- purrr::reduce(list(vfci_shock_penalty,vfci_shock_reject,vfci_shock_penalty_vfci_in_levels,vfci_shock_penalty_stationary_model), dplyr::full_join, by = "date")
-instruments_vfci$qtr <- tsibble::yearquarter(instruments_vfci$date)
-instruments_vfci <- instruments_vfci %>% 
-  as_tibble() %>% 
-  dplyr::select(-c(date)) %>%
-  dplyr::mutate(dplyr::across(dplyr::where(is.numeric),   ~ scale(.)[,1], .names = "std_{col}") )
-
-
-## Merge instruments with all other variables -----------------------------
-variables <- purrr::reduce(list(variables, instruments_vfci), dplyr::full_join, by = "qtr")
-
-# VAR ---------------------------------------------------------------------
-var.data <- dplyr::select(variables, c(
-  "qtr",
-  "fedfunds",
-  "log.gdpc1",
-  "log.pcepilfe",
-  "vfci"
-)) %>%
-  dplyr::mutate(qtr = tsibble::yearquarter(qtr))
-
-# convert to time-series, re-order to match Stata
-var_data_ts <- as.ts(var.data)
-var_data_ts <- var_data_ts[, c("log.gdpc1", "log.pcepilfe", "fedfunds", "vfci")]
-
-# estimate reduced-form VAR
-reduced.form <- vars::VAR(var_data_ts, p = 3)
-# structural VAR identification using cholesky ordering
-structural.vfci_last <- svars::id.chol(
-  reduced.form,
-  order_k = c("log.gdpc1", "log.pcepilfe", "fedfunds", "vfci")
-)
-structural.fedfunds_last <- svars::id.chol(
-  reduced.form,
-  order_k = c("log.gdpc1", "log.pcepilfe", "vfci", "fedfunds")
-)
-# irf
-impulse.response.vfci_last <- vars::irf(
-  structural.vfci_last,
-  n.ahead = 100
-)
-impulse.response.fedfunds_last <- vars::irf(
-  structural.fedfunds_last,
-  n.ahead = 100
-)
-
 # Save ---------------------------------------------------------------------
-
-# plot irf
-plot(impulse.response.vfci_last, scales = "free_y")
-plot(impulse.response.fedfunds_last, scales = "free_y")
 
 # save and export
 variables$date <- zoo::as.Date(variables$qtr)
@@ -652,10 +544,7 @@ variables <- variables %>%
     "gap","baa_aaa","t10y3m","tedr","es","gspc",
     "gr4.gspc","gr1.gspc","gspc_ret","gspc_vol",
     "mp_shock_ns","mp_shock_mr","mp_shock_rr","mp_shock_int_rr_mar_ns","mp_shock_int_rr_ns",
-    "y_shock","std_y_shock","std_mp_shock_ns","std_mp_shock_int_rr_ns","vfci_shock_penalty",
-    "vfci_shock_reject","std_vfci_shock_penalty","std_vfci_shock_reject",
-    "vfci_shock_penalty_vfci_in_levels","vfci_shock_penalty_stationary_model",
-    "std_vfci_shock_penalty_vfci_in_levels","std_vfci_shock_penalty_stationary_model",
+    "y_shock","std_y_shock","std_mp_shock_ns","std_mp_shock_int_rr_ns",
     "gsfci","ecy","ebp","gz","ciss",
     "pc1","pc2","pc3","pc4","pc5","pc6",
     "mu","vfci","vfci_lev"

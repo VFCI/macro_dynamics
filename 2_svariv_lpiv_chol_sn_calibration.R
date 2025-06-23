@@ -27,14 +27,7 @@ y_instrument    <- c("std_y_shock")
 
 mp_instrument   <- c("std_mp_shock_int_rr_ns")
 
-if (type == "baseline") {
-  vfci_data$vfci2 <- vfci_data$vfci
-  vfci_instrument <- c("std_vfci_shock_penalty")
-} else if (type == "stationary") {
-  vfci_instrument <- c("std_vfci_shock_penalty_stationary_model")
-} else if (type == "vfci_lev") {
-  vfci_instrument <- c("std_vfci_shock_penalty_vfci_in_levels")
-}
+vfci_instrument <- c("vfci")
 
 #-------------------------------------------------------------------------------
 # 3. Sample and tidyng-up

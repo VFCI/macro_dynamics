@@ -4,7 +4,7 @@ source('library_packages.R')
 source('load_functions.R')
 load_functions() 
 
-source('create_vfci_and_instruments.R')
+source('create_vfci.R')
 source('create_figures.R')
 source('create_tables.R')
 

@@ -5,7 +5,7 @@
 # Structural form residuals are named in the following format (model)_(var)
 # For instance rf_bvar_GDP
 suffix <- gsub(" ","_",var_names)
-mod_names <- c("bvar","svariv_ff","svariv_vfci","svariv_y","chol_vfci","sign_res")
+mod_names <- c("bvar","svariv_ff","svariv_y","chol_vfci","sign_res")
 
 #-------------------------------------------------------------------------------
 # Instruments
@@ -36,9 +36,6 @@ bvar_sf_res   <- scale(data.frame(apply(mcmc_output$eout * lambda_scaling,c(1,2)
 # SVAR-IV 
 svariv_sf_res_ff <- full_join(data.frame(date = vfci_data$date),iv_var_ff$residuals$H_1) 
 svariv_sf_res_ff[,3:dim(svariv_sf_res_ff)[2]] <- scale(svariv_sf_res_ff[,3:dim(svariv_sf_res_ff)[2]])
-
-svariv_sf_res_vfci <- full_join(data.frame(date = vfci_data$date),iv_var_vfci$residuals$H_1)
-svariv_sf_res_vfci[,3:dim(svariv_sf_res_vfci)[2]] <- scale(svariv_sf_res_vfci[,3:dim(svariv_sf_res_vfci)[2]])
 
 svariv_sf_res_y <- full_join(data.frame(date = vfci_data$date),iv_var_y$residuals$H_1)
 svariv_sf_res_y[,3:dim(svariv_sf_res_y)[2]] <- scale(svariv_sf_res_y[,3:dim(svariv_sf_res_y)[2]])
@@ -105,10 +102,10 @@ df_res_names_rf <- paste("rf","res",suffix,sep="_")
 df_res_names_sf <- c(t(sapply(suffix,function(x) paste("sf",mod_names,x,sep="_"))))
 colnames_data_res <- c("date",df_res_names_rf,df_res_names_sf,colnames(vfci_ins))
 
-data_res <- data.frame(vfci_data$date,rbind(matrix(NA,nvar,2*nvar),cbind(rf_residuals,bvar_sf_res)),svariv_sf_res_ff[,3:(3+nvar-1)],svariv_sf_res_vfci[,3:(3+nvar-1)],svariv_sf_res_y[,3:(3+nvar-1)],chol_sf_res_vfci[,3:(3+nvar-1)],sign_restr_shocks,vfci_ins)
+data_res <- data.frame(vfci_data$date,rbind(matrix(NA,nvar,2*nvar),cbind(rf_residuals,bvar_sf_res)),svariv_sf_res_ff[,3:(3+nvar-1)],svariv_sf_res_y[,3:(3+nvar-1)],chol_sf_res_vfci[,3:(3+nvar-1)],sign_restr_shocks,vfci_ins)
 names(data_res) <- colnames_data_res
 
-rm(suffix,mod_names,vfci_ins,rf_residuals,bvar_sf_res,svariv_sf_res_ff,svariv_sf_res_vfci,svariv_sf_res_y,chol_sf_res_vfci,df_res_names_rf,df_res_names_sf,colnames_data_res)
+rm(suffix,mod_names,vfci_ins,rf_residuals,bvar_sf_res,svariv_sf_res_ff,svariv_sf_res_y,chol_sf_res_vfci,df_res_names_rf,df_res_names_sf,colnames_data_res)
 
 save(data_res,file = 'output/res_ins_data.Rdata')
 
@@ -175,12 +172,12 @@ dev.off()
 #-------------------------------------------------------------------------------
 # 4. Correlation matrix of VFCI structural shocks from all models and instruments
 #-------------------------------------------------------------------------------
-shock_type <- c("sf_bvar_VFCI", "std_vfci_shock_penalty", "sf_sign_res_VFCI", "sf_chol_vfci_VFCI")
+shock_type <- c("sf_bvar_VFCI", "sf_sign_res_VFCI", "sf_chol_vfci_VFCI")
 
 vars_for_corr <- data_res %>% 
   filter(date>=(as.Date("1970-01-01"))) %>%
   select(c(all_of(shock_type))) 
-colnames(vars_for_corr) <- c("Vol-BVAR", " VFCI Instrument", "Sign Res", "Cholesky")
+colnames(vars_for_corr) <- c("Vol-BVAR", "Sign Res", "Cholesky")
 rownames(vars_for_corr) <- NULL
 mcor <- cor(vars_for_corr)
 mcor <- round(mcor, digits = 2)
