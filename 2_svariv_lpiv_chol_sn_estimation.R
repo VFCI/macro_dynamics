@@ -38,13 +38,22 @@ df_irf_ff_68 <- sovereign::var_irf(iv_var_ff,
                                 CI = c(0.16, 0.84))
 df_irf_ff_68 <- as.data.frame(df_irf_ff_68)
 
-df_irf_ff$response.lower.68 <- df_irf_ff_68$response.lower
-df_irf_ff$response.upper.68 <- df_irf_ff_68$response.upper
 
+## Need to rescale the SVAR-IV shock to be a 1 standard deviation shock
+res <- as.matrix(resid(iv_var_ff)$H_1[, -c(1,2)]) |> na.omit()
+b_sov <- as.matrix(sovereign:::solve_B(iv_var_ff))
+b_sov_q <- solve(t(chol(cov(res)))) %*% b_sov
+scale <- 1 / sqrt(t(b_sov_q[, 1]) %*% b_sov_q[, 1])
+
+df_irf_ff$response <- df_irf_ff$response * c(scale)
+df_irf_ff$response.lower <- df_irf_ff$response.lower * c(scale)
+df_irf_ff$response.upper <- df_irf_ff$response.upper * c(scale)
+df_irf_ff$response.lower.68 <- df_irf_ff_68$response.lower * c(scale)
+df_irf_ff$response.upper.68 <- df_irf_ff_68$response.upper * c(scale)
 
 #Impact of the VFCI shock on all variables
 if (type == "baseline") {
-iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_in_system_baseline)],vfci_data[vfci_instrument]), 
+iv_var_vfci <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_in_system_baseline)], vfci_data[vfci_instrument]), 
                          p = nlags, 
                          horizon = 20,
                          freq = 'quarter',
@@ -78,8 +87,17 @@ df_irf_vfci_68 <- sovereign::var_irf(iv_var_vfci,
                                   CI = c(0.16, 0.84))
 df_irf_vfci_68 <- as.data.frame(df_irf_vfci_68)
 
-df_irf_vfci$response.lower.68 <- df_irf_vfci_68$response.lower
-df_irf_vfci$response.upper.68 <- df_irf_vfci_68$response.upper
+## Need to rescale the SVAR-IV shock to be a 1 standard deviation shock
+res <- as.matrix(resid(iv_var_vfci)$H_1[, -c(1,2)]) |> na.omit()
+b_sov <- as.matrix(sovereign:::solve_B(iv_var_vfci))
+b_sov_q <- solve(t(chol(cov(res)))) %*% b_sov
+scale <- 1 / sqrt(t(b_sov_q[, 1]) %*% b_sov_q[, 1])
+
+df_irf_vfci$response <- df_irf_vfci$response * c(scale)
+df_irf_vfci$response.lower <- df_irf_vfci$response.lower * c(scale)
+df_irf_vfci$response.upper <- df_irf_vfci$response.upper * c(scale)
+df_irf_vfci$response.lower.68 <- df_irf_vfci_68$response.lower * c(scale)
+df_irf_vfci$response.upper.68 <- df_irf_vfci_68$response.upper * c(scale)
 
 #Impact of the growth shock on all variables
 if (type == "baseline") {
@@ -117,12 +135,21 @@ df_irf_y_68 <- sovereign::var_irf(iv_var_y,
                                    CI = c(0.16, 0.84))
 df_irf_y_68 <- as.data.frame(df_irf_y_68)
 
-df_irf_y$response.lower.68 <- df_irf_y_68$response.lower
-df_irf_y$response.upper.68 <- df_irf_y_68$response.upper
+## Need to rescale the SVAR-IV shock to be a 1 standard deviation shock
+res <- as.matrix(resid(iv_var_y)$H_1[, -c(1,2)]) |> na.omit()
+b_sov <- as.matrix(sovereign:::solve_B(iv_var_y))
+b_sov_q <- solve(t(chol(cov(res)))) %*% b_sov
+scale <- 1 / sqrt(t(b_sov_q[, 1]) %*% b_sov_q[, 1])
+
+df_irf_y$response <- df_irf_y$response * c(scale)
+df_irf_y$response.lower <- df_irf_y$response.lower * c(scale)
+df_irf_y$response.upper <- df_irf_y$response.upper * c(scale)
+df_irf_y$response.lower.68 <- df_irf_y_68$response.lower * c(scale)
+df_irf_y$response.upper.68 <- df_irf_y_68$response.upper * c(scale)
 
 #For a 2x2 IRF panel
 if (plot_within_this_code == 1) {
-df_irf_svar_iv <- df_irf_y #df_irf_ff, df_irf_vfci, df_irf_y
+df_irf_svar_iv <- df_irf_vfci #df_irf_ff, df_irf_vfci, df_irf_y
 df_irf_svar_iv <- df_irf_svar_iv[,c(-2,-7,-8)]  
 df_irf_svar_iv %>% tidyr::pivot_longer(-c(target,horizon)) %>%
   ggplot(aes(x=horizon, y=value, color= name,group=name))+
@@ -317,3 +344,75 @@ if (plot_within_this_code == 1) {
   irfplot(irfdraws=irfs_vfci, type="median", labels=lab, save=FALSE, bands=c(0.16, 0.84),grid=TRUE, bw=FALSE)
 }
 #-------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------
+#Model 5: Cholesky - VFCI ordered First (ie VFCI as IV)
+#--------------------------------------------------------------------
+
+# VFCI ordered last
+if (type == "baseline") {
+chol_var_vfci_first <- sovereign::VAR(data = cbind(vfci_data_mp["date"],vfci_data_mp[,c(vars_vfci_first_baseline)]), 
+                              p = nlags, 
+                              horizon = 19,
+                              freq = 'quarter',
+                              structure = 'short')
+} else if (type == "stationary") {
+  chol_var_vfci_first <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_vfci_last_stationary)]), 
+                                  p = nlags, 
+                                  horizon = 19,
+                                  freq = 'quarter',
+                                  structure = 'short')
+} else if (type == "vfci_lev") {
+  chol_var_vfci_first <- sovereign::VAR(data = cbind(vfci_data["date"],vfci_data[,c(vars_vfci_last_vfci_lev)]), 
+                                  p = nlags, 
+                                  horizon = 19,
+                                  freq = 'quarter',
+                                  structure = 'short')
+}
+chol_irf_vfci_first <- sovereign::var_irf(chol_var_vfci_first, 
+                                  horizon = 19,
+                                  CI = c(0.05,0.95))
+
+chol_irf_vfci_first.68 <- sovereign::var_irf(chol_var_vfci_first, 
+                                    horizon = 19,
+                                    CI = c(0.16,0.84))
+chol_irf_vfci_first$response.lower.68 <- chol_irf_vfci_first.68$response.lower
+chol_irf_vfci_first$response.upper.68 <- chol_irf_vfci_first.68$response.upper
+
+
+#--------------------------------------------------------------------
+#Model 6: LP - VFCI as IV
+#--------------------------------------------------------------------
+
+#Impact of the VFCI shock on all variables
+if (type == "baseline") {
+  endog_data <- vfci_data[, vars_vfci_last_baseline]
+} else if (type == "stationary") {
+  endog_data <- vfci_data[, vars_vfci_last_stationary]
+} else if (type == "vfci_lev") {
+  endog_data <- vfci_data[, vars_vfci_last_vfci_lev]
+}
+shock_vfci <- vfci_data[, "vfci"] |> scale() ## Make a 1 std dev shock
+shock_vfci <- as.data.frame(shock_vfci)
+
+# Estimate linear model
+results_lin_vfci <- lpirfs::lp_lin_iv(endog_data,
+                              lags_endog_lin = nlags,
+                              shock = shock_vfci,
+                              trend = 2,
+                              confint = 1.65,
+                              adjust_se = TRUE,
+                              use_nw = TRUE,
+                              hor = 20)
+
+results_lin_vfci.68 <- lpirfs::lp_lin_iv(endog_data,
+                                   lags_endog_lin = nlags,
+                                   shock = shock_vfci,
+                                   trend = 2,
+                                   confint = 1,
+                                   adjust_se = TRUE,
+                                   use_nw = TRUE,
+                                   hor = 20)
+
+results_lin_vfci$irf_lin_low.68 <- results_lin_vfci.68$irf_lin_low
+results_lin_vfci$irf_lin_up.68 <- results_lin_vfci.68$irf_lin_up

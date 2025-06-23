@@ -5,15 +5,19 @@ library("dplyr")
 
 vars_in_system_baseline     <- c('lgdp','lpce','vfci','fedfunds') 
 vars_vfci_last_baseline     <- c('lgdp','lpce','fedfunds','vfci') 
+vars_vfci_first_baseline    <- c('vfci','lgdp','lpce','fedfunds') 
 
 vars_in_system_stationary   <- c('ygr','infl_pce','vfci','fedfunds') 
 vars_vfci_last_stationary   <- c('ygr','infl_pce','fedfunds','vfci')
+vars_vfci_first_stationary   <- c('vfci','ygr','infl_pce','fedfunds')
 
 vars_in_system_vfci_lev     <- c('lgdp','lpce','vfci_lev','fedfunds') 
 vars_vfci_last_vfci_lev     <- c('lgdp','lpce','fedfunds','vfci_lev')
+vars_vfci_firstt_vfci_lev     <- c('vfci_lev','lgdp','lpce','fedfunds')
 
 vars_in_system_vfci_lev_stationary <- c('ygr','infl_pce','vfci_lev','fedfunds')  
 vars_vfci_last_vfci_lev_stationary <- c('ygr','infl_pce','fedfunds','vfci_lev')
+vars_vfci_last_vfci_lev_stationary <- c('vfci_lev', 'ygr','infl_pce','fedfunds')
 
 #-------------------------------------------------------------------------------
 # 2. Specify relevant instruments
@@ -24,6 +28,7 @@ y_instrument    <- c("std_y_shock")
 mp_instrument   <- c("std_mp_shock_int_rr_ns")
 
 if (type == "baseline") {
+  vfci_data$vfci2 <- vfci_data$vfci
   vfci_instrument <- c("std_vfci_shock_penalty")
 } else if (type == "stationary") {
   vfci_instrument <- c("std_vfci_shock_penalty_stationary_model")

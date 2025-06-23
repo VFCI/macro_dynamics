@@ -490,7 +490,7 @@ variables_fig <- variables %>%
 
 p <- 
   variables_fig |>
-  pivot_longer(-c(qtr, vfci)) |>
+  tidyr::pivot_longer(-c(qtr, vfci)) |>
   group_by(name) |>
   mutate(value_scaled = scale(value)) |>
   ggplot(aes(x = qtr)) +
