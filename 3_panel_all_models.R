@@ -127,9 +127,8 @@ svar_df1$shock <- vol_bvar_second_var
 svar_df1$model <- "SVAR-IV"
 svar_df1$horizon <- svar_df1$horizon + 1
 
-svar_df2 <- df_irf_vfci[df_irf_vfci$target == GDP_FF_FOR_IV,]
-# svar_df2 <- chol_irf_vfci_first[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type,]
 
+svar_df2 <- chol_irf_vfci_first[chol_irf_vfci$target == GDP_FF_FOR_CHOL & chol_irf_vfci$shock == vfci_type,]
 svar_df2$target <- vol_bvar_second_var 
 svar_df2$shock <- vol_bvar_type_vfci
 svar_df2$model <- "SVAR-IV"
@@ -148,7 +147,7 @@ lp_df1 <- data.frame(
   model = "LP-IV"
 )
 
-lp_vfci <- results_lin_iv_vfci
+lp_vfci <- results_lin_vfci
 lp_df2 <- data.frame(
   horizon = 1:20,
   target = vol_bvar_second_var,
