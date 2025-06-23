@@ -101,13 +101,13 @@ df_irf_vfci$response.upper.68 <- df_irf_vfci_68$response.upper * c(scale)
 
 #Impact of the growth shock on all variables
 if (type == "baseline") {
-iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_stationary)],vfci_data_y[y_instrument]), 
+iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_baseline)],vfci_data_y[y_instrument]), 
                              p = nlags, 
                              horizon = 20,
                              freq = 'quarter',
                              structure = 'IV',
                              instrument = y_instrument, 
-                             instrumented = "ygr")
+                             instrumented = "lgdp")
 } else if (type == "stationary") {
   iv_var_y <- sovereign::VAR(data = cbind(vfci_data_y["date"],vfci_data_y[,c(vars_in_system_stationary)],vfci_data_y[y_instrument]), 
                              p = nlags, 
@@ -238,7 +238,7 @@ results_lin_iv_vfci$irf_lin_up.68 <- results_lin_iv_vfci.68$irf_lin_up
 
 #Impact of the Y shock on all variables
 if (type == "baseline") {
-  endog_data2 <- vfci_data[, vars_in_system_stationary]
+  endog_data2 <- vfci_data[, vars_in_system_baseline]
 } else if (type == "stationary") {
   endog_data2 <- vfci_data[, vars_in_system_stationary]
 } else if (type == "vfci_lev") {
