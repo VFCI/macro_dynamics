@@ -163,6 +163,42 @@ tab |>
   writeLines("./output/baseline/tables/fcis_on_pcs.tex")
 
 
+## Table R^2 from regressing FCIs on various numbers of PCs
+
+model_formulas <-
+  c(NFCI = "nfci", GSFCI = "gsfci", VIX = "vixcls") |>
+  purrr::map(function(.y){
+    1:6 |>
+    purrr::map(function(.x) {
+      paste0(.y, " ~ ", paste0("pc", 1:.x, collapse = " + "))
+    })
+  })
+
+models <- 
+  model_formulas |>
+  map_depth(lm, data = variables, .depth = 2)
+
+tidy_res <-
+  models |>
+  map_depth(broom::glance, .depth = 2) |>
+  map(list_rbind, names_to = "num_pcs") |>
+  purrr::list_rbind(names_to = "model")
+
+tab <-
+  tidy_res |>
+  dplyr::select(model, num_pcs, r.squared) |>
+  pivot_wider(names_from = model, values_from = r.squared) |>
+  gt() |>
+  fmt_number(decimals = 2, columns = 2:4) |>
+  cols_label(num_pcs = "Number of PCs")
+
+tab |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  writeLines("./output/appendix/tables/fcis_rsquared_pcs.tex")
+
+
 
 ## Table. Regression of risk premia on VFCI ----------------------------------------
 library(dplyr)
