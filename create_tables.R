@@ -1,5 +1,3 @@
-# pick dates, variables
-
 base::load(file = here::here("variables.RData"))
 date_begin <- "1970 Q1"
 date_end <- "2022 Q3"
@@ -9,18 +7,93 @@ options("modelsummary_format_numeric_latex" = "plain")
 
 # Tables ------------------------------------------------------------------
 
+## Goodness of Fit values used for modelsummary
+gm <-tibble::tribble(
+  ~raw,        ~clean, ~fmt,
+  "nobs",      "N",     0,
+  "r.squared", "R²", 2
+)
+
+## Table. Regression of FYQ and FCQ on PCs ---------------------------------
+library(stringr)
+library(purrr)
+m1 <- results$fgr1.gdpc1$hetreg
+m2 <- results$fgr1.pcecc96$hetreg
+v1 <- structure(m1, class = c("het"))
+v2 <- structure(m2, class = c("het"))
+
+signs_to_flip <- -1 * sign(attr(v1$apVar, "Pars")[-5])
+
+m1$coefficients <- coef(m1) * c(1, signs_to_flip)
+m2$coefficients <- coef(m2) * c(1, signs_to_flip)
+
+attr(v1$apVar, "Pars") <- attr(v1$apVar, "Pars") * c(signs_to_flip, 1)
+attr(v2$apVar, "Pars") <- attr(v2$apVar, "Pars") * c(signs_to_flip, 1)
+
+#### Generate table
+tab_a <- modelsummary(
+  list(
+    "GDP" = m1,
+    "C" = m2
+  ),
+  output = "gt",
+  coef_rename = toupper,
+  statistic = "({statistic})",
+  gof_map = NA,
+  fmt= '%.2f',
+  coef_omit= '(Intercept)',
+  stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01)
+) |>
+  gt::rm_source_notes() |>
+  gt::tab_spanner(label =  "Panel A: Conditional Mean", columns = everything())
+
+tab_a |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  writeLines("./output/baseline/tables/mean_vol_reg_coefs_means.tex")
+
+tab_b <- modelsummary(
+  list(
+    "GDP" = v1,
+    "C" = v2
+  ),
+  output = "gt",
+  coef_rename = toupper,
+  statistic = "({statistic})",
+  gof_map = NA,
+  fmt= '%.2f',
+  coef_omit= '(Intercept)',
+  stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01)
+) |>
+  gt::rm_source_notes() |>
+  gt::tab_spanner(label =  "Panel B: Log Conditional Volatility", columns = everything())
+
+tab_b |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  writeLines("./output/baseline/tables/mean_vol_reg_coefs_vols.tex")
+
+
+
 ## Table. Principal Components Loadings -----------------------------------
 loadings <- summary(vfci_baseline$hetreg$pc)
 
 cumvar <- 100*cumsum(loadings$sdev^2)/sum(loadings$sdev^2)
 
+weights <- loadings$rotation[c("annual_ret","gspc_vol","t10y3m","tb3smffm","aaa10ym","baa_aaa"),1:4]
+
+### Make all PCs have positive impact on Ret
+weights <- t(t(weights) * signs_to_flip)
+
 table_data <- t(rbind(
-  loadings$rotation[c("annual_ret","gspc_vol","t10y3m","tb3smffm","aaa10ym","baa_aaa"),1:4],
+  weights,
   cumvar[1:4]
 ))
 colnames(table_data)[7]<-"cum_var"
 
-table_data_long <- table_data %>% 
+table_data <- table_data %>% 
   tidyr::as_tibble(., rownames = "PC") %>% 
   rename(
     "Cred" = aaa10ym,
@@ -30,31 +103,26 @@ table_data_long <- table_data %>%
     "Vol" = gspc_vol,
     "Term" = t10y3m,
     "Liq" = tb3smffm
-  ) %>% 
-  tidyr::pivot_longer(
-    !PC,
-    names_to = "var",
-    values_to = "value",
-    cols_vary = "slowest"
   )
-
 ### Generate table
-tab <- modelsummary::datasummary(
-  PC ~  mean * value * var,
-  data = table_data_long,
-  fmt = fmt_decimal(2),
-  output = "gt"
-) %>% 
-  rm_stubhead() %>%
-  cols_move_to_end(columns = "Cumulative Variance") %>% 
+tab <- table_data |>
+  gt() |>
+  cols_label(PC = "") |>
+  fmt_number(decimals = 2) |>
+  fmt_percent(columns = 8, decimals = 1, scale_values = FALSE) |>
+  cols_move_to_end(columns = "Cumulative Variance") |>
   cols_move(
     columns = c("Vol","Term","Liq","Cred","Def"),
     after = "Ret"
-    ) %>% 
-  cols_align('center', columns = 2:8) 
- 
-#tab
-#as_latex(tab)
+    ) |>
+  cols_align('center', columns = 2:8) |>
+  tab_spanner(label = "Loadings", columns = 2:7)
+
+tab |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  writeLines("./output/baseline/tables/pc_table.tex")
 
 
 ## Table. Regression of FCIs on PCs -------------------------------------
@@ -66,66 +134,37 @@ reg3 <- paste("vixcls","~",paste(paste0("pc", 1:4), collapse='+'))
 models<-list(
   "NFCI" = lm(reg1,variables),
   "GSFCI" =  lm(reg2,variables),
-  "VIX" = lm(reg3,variables) 
+  "VIX" = lm(reg3,variables)
 )
+
+models[[1]]$coefficients <- models[[1]]$coefficients * c(1, signs_to_flip)
+models[[2]]$coefficients <- models[[2]]$coefficients * c(1, signs_to_flip)
+models[[3]]$coefficients <- models[[3]]$coefficients * c(1, signs_to_flip)
+
 ### Generate table
-Map(\(out) modelsummary::modelsummary(models,
-                                      coef_rename = toupper,
-                                      statistic = "[{statistic}]", #"std.error",
-                                      stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
-                                      gof_map = c("nobs", "r.squared"),
-                                      fmt_statistic("estimate" = 2, "statistic" = 2),
-                                      coef_omit= '(Intercept)',
-                                      title = "Regressions of financial conditions indices on principal components of financial variables \\label{tab:FCIregressions}",
-                                      output = out
-), list("gt",here::here("output","baseline","tables","fcis_on_pcs_new.tex")) )
+tab <- modelsummary::modelsummary(
+  models,
+  coef_rename = toupper,
+  statistic = "({statistic})",
+  stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
+  gof_map = gm,
+  fmt_statistic("estimate" = 2, "statistic" = 2),
+  coef_omit= '(Intercept)',
+  output = "gt"
+) |>
+  rm_source_notes()
 
+tab |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  stringr::str_replace_all("N ", "\\\\midrule\\\\addlinespace[2.5pt]
+  N ") |>
+  writeLines("./output/baseline/tables/fcis_on_pcs.tex")
 
-## Table. Regression of FYQ and FCQ on PCs ---------------------------------
-library(stringr)
-library(purrr)
-library(broom.mixed)
-m1 <- results$fgr1.gdpc1$hetreg
-m2 <- results$fgr1.pcecc96$hetreg
-v1 <- structure(m1, class = c("het"))
-v2 <- structure(m2, class = c("het"))
-
-#### Generate table
-models <- list(
-  "Conditional Mean"=list(
-    "Real GDP Growth" = m1,
-    "Real Consumption Growth" = m2
-  ),
-  "Conditional Log-Volatility"=list(
-    "Real GDP Growth" = v1,
-    "Real Consumption Growth" = v2
-  )
-)
-Map(\(out) modelsummary::modelsummary(models,
-                                      shape="rbind",
-                                      coef_rename = toupper,
-                                      statistic = "({statistic})", #"({std.error})", 
-                                      notes = "$t$-statistics in parentheses",
-                                      stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
-                                      gof_map = c("nobs", "r.squared"),
-                                      fmt= '%.2f',
-                                      coef_omit= '(Intercept)',
-                                      title = "Conditional mean and volatility of GDP and consumption spanned by financial assets \\label{tab:reg2}",
-                                      output = out
-), list("gt",here::here("output","baseline","tables","significance_of_pcs_1962_2022_new.tex")) )
-
-# The LR test at the bottom of the output is a test for the parameters of the variance function. The
-# χ2(1) statistic of 19.59 is significant, indicating that heteroskedasticity is present. If we had preferred
-# the Wald test for heteroskedasticity instead of the LR test, we would have specified the waldhet
-# option.
-# see if parameters and performance support your model type
 
 
 ## Table. Regression of risk premia on VFCI ----------------------------------------
-library(recipes)
-library(workflowsets)
-library(parsnip)
-library(rsample)
 library(dplyr)
 library(ggplot2)
 library(purrr)
@@ -133,7 +172,6 @@ library(tidyr)
 library(tibble)
 library(modelsummary)
 library(stringr)
-library(tribe)
 
 y <- c("gz","ecy","ebp",
        "tedr","tedrate","lior3m","es",
@@ -147,12 +185,15 @@ y_lag <- c("lag(gz)","lag(ecy)","lag(ebp)",
 x <- c("vfci","nfci","gsfci","vixcls")
 x <- c(x,paste0(x,collapse="+"))
 
-formulas <- y %>% str_c(y_lag,sep = "~") %>% 
+formulas <- y %>%
+  stringr::str_c(y_lag,sep = "~") %>% 
   expand_grid(x) %>% 
-  unite("formula",sep="+")
+  tidyr::unite("formula",sep="+")
 
-models<- purrr::map(formulas[[1]],\(x) lm(as.formula(x),data=variables)) %>% 
-  setNames(toupper(str_extract(formulas[[1]],".*(?=~)")) ) %>% enframe
+models <-
+  purrr::map(formulas[[1]],\(x) lm(as.formula(x),data=variables)) %>% 
+  setNames(toupper(str_extract(formulas[[1]],".*(?=~)")) ) %>%
+  tibble::enframe()
 
 nmod <- (models %>% 
            group_by(name) %>%
@@ -165,64 +206,77 @@ rows <- tribble(~"0",~"1",~"2",~"3",~"4",~"5","","GZ","GZ","GZ","GZ","GZ")
 attr(rows,"position")<-c(0)
 
 tidy_name = function(x,nn){
-  str_replace(x,"\\s*\\([^\\)]+\\)", str_c(" ",toupper(nn))) %>% toupper %>% str_replace("LAG","Lag")
-}
-captions = function(nn){
-  switch(nn, 
-         gz="spread is a corporate bond risk premium measure of \\cite{{GilchristZakrajsek2012}}", 
-         ecy="stands for the excess CAPE yield of \\cite{{Shiller2000}} and is a commonly used measure of the equity market CAPE equity risk premium."
-  )
+  x |>
+  str_replace("\\s*\\([^\\)]+\\)", str_c(" ",toupper(nn))) |>
+  toupper() |>
+  str_replace("LAG","Lag") |>
+  str_replace("VIXCLS", "VIX")
 }
 
+make_reg_table <- function(yvar, short_label, label) {
+  models |>
+  filter(name == yvar) |>
+  pull(value) |>
+  modelsummary(
+    statistic = "statistic",
+    fmt = fmt_statistic("estimate" = 2, "statistic" = 1),
+    vcov = "stata",
+    stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
+    gof_map = gm,
+    coef_omit= '(Intercept)',
+    output = "gt",
+    coef_rename = \(x) tidy_name(x, short_label),
+    escape = FALSE
+  ) |>
+  gt::rm_source_notes() |>
+  gt::tab_spanner(label = label, columns = 2:6)
+}
 
-gm <-tibble::tribble(
-  ~raw,        ~clean, ~fmt,
-  "nobs",      "N",     0,
-  "r.squared", "$R^2$", 2)
+make_reg_table("GZ", "GZ", "Credit Spread (GZ)") |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  stringr::str_replace_all("N ", "\\\\midrule\\\\addlinespace[2.5pt]
+  N ") |>
+  writeLines("./output/baseline/tables/reg_GZ.tex")
 
-Map(\(yvar) 
-    Map(\(out) 
-        models %>% pivot_wider(values_fn = list) %>% 
-          pull(toupper(yvar)) %>% 
-          unlist(.,recursive=FALSE) %>% 
-          # dvnames %>%
-          modelsummary(.,
-                       add_rows = rows %>% replace(2:nmod[yvar],values=toupper(yvar)),
-                       coef_rename = \(x) tidy_name(x,yvar),
-                       vcov = "stata",
-                       statistic = "statistic", #statistic = "[{statistic}]","std.error
-                       stars = c('*' = 0.10,'**' = 0.05,'***' = 0.01),
-                       notes = "$t$ statistics in parentheses",
-                       gof_map = gm,
-                       fmt= fmt_statistic("estimate" = 2, "statistic" = 1),
-                       coef_omit= '(Intercept)',
-                       caption = str_glue("\\textbf{{Association between {yvar} spread and FCIs:}} 
-                                  The {yvar} ", captions(tolower(yvar)), "\\label{{tab:{tolower(yvar)}_regs}}."),
-                       output = out
-          ),
-        list("gt",here::here("output","baseline","tables","reg_gz_new.tex"))), toupper(y))
+make_reg_table("ECY", "ECY", "Excess PE Ratio (ECY)") |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  stringr::str_replace_all("N ", "\\\\midrule\\\\addlinespace[2.5pt]
+  N ") |>
+  writeLines("./output/baseline/tables/reg_ECY.tex")
 
-## Table. VAR variables -----------------------------------
+make_reg_table("ACMTP01", "TP", "Term Premium (TP)") |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  stringr::str_replace_all("N ", "\\\\midrule\\\\addlinespace[2.5pt]
+  N ") |>
+  writeLines("./output/baseline/tables/reg_TP.tex")
+
+
+## Table. VAR variables Summary Statistics -----------------------------------
 VAR_date_begin = "1962 Q1"
 VAR_date_end = "2022 Q3"
 
-VAR_fred_vars <- variables %>%
-  select(fedfunds, lgdp, lpce, qtr) %>% 
-  filter(between(as.Date(qtr), as.Date(as.yearqtr(VAR_date_begin)), as.Date(as.yearqtr(VAR_date_end)))) 
+VAR_fred_vars <- variables |>
+  filter(between(as.Date(qtr), as.Date(as.yearqtr(VAR_date_begin)), as.Date(as.yearqtr(VAR_date_end)))) |>
+  select(fedfunds, lgdp, lpce, vfci) |>
+  mutate(vfci = scale(vfci)) |>
+  rename(logGDP = "lgdp", logP = "lpce", VFCI = "vfci")
 
-vtable::st(VAR_fred_vars,
-           digits = 2,
-           summ=c("mean(x)","sd(x)","min(x)","max(x)","notNA(x)"),
-           summ.names = c("Mean","SD","Min","Max","N"),
-           labels=c("Federal Funds Rate","log of Real GDP","log of Core PCE Deflator"),
-           title = "Title",
-           note = "\\textbf{Descriptive Statistics for the Macro-Financial Variables:} The VFCI is constructed in the previous section, the remaining data is from the FRED database of the Federal Reserve Bank of St Louis.",
-           anchor = "sumstats_for_var",
-           file = here::here("output","baseline","tables","table7.tex"),
-           align = 'p{.3\\textwidth}ccccccc',
-           fit.page = '\\textwidth',
-           note.align = 'p{.3\\textwidth}ccccccc',
-           out = "latex"
-           # out = "viewer"
-)
+tab <-
+  modelsummary::datasummary(
+    formula = logGDP + logP + fedfunds + VFCI ~ Mean + SD + Min + Max,
+    data = VAR_fred_vars,
+    output = "gt"
+  )
+
+tab |>
+  as_latex() |>
+  as.character() |>
+  stringr::str_replace_all("longtable", "tabular") |>
+  writeLines("./output/baseline/tables/summary_stats.tex")
 

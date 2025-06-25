@@ -9,13 +9,27 @@ if (avg_regime == 1 & type == "baseline") {
     lambda_median = apply(lambda, c(1,2), median); # taking the median across draws
     lambda_median <- format(round(lambda_median, 2))
     table_rel_variance <- as.data.frame(lambda_median)
-    row.names(table_rel_variance) <- c("Log GDP", "Log PCE", "VFCI", "Fed Funds")
     colnames(table_rel_variance) <- c("1962Q1-1979Q3", "1979Q3-1982Q4", "1983Q1-1989Q4", "1990Q1-2007Q4", "2008Q1-2010Q4", "2011Q1-2019Q4", "2020Q1-2022Q3")
+    table_rel_variance$variable <- c("logGDP", "logP", "VFCI", "fedfunds")
 
-    #Export to TeX
-    library("xtable")
-    tab<-xtable(table_rel_variance,  align=c("l","c","c","c","c","c","c","c"))
-    print(tab,file="output/baseline/tables/table_rel_var.tex",append=F)
+    descriptions <- c("Oil crisis, stagflation", "Volcker disinflation", "S&L crisis defaults", "Great Moderation", "Financial crisis", "ZLB, post-crisis recovery", "Covid-19 pandemic")
+
+    tab <-
+      table_rel_variance |>
+      tidyr::pivot_longer(-variable, names_to = "Subperiod") |>
+      tidyr::pivot_wider(names_from = "variable", values_from = "value") |>
+      mutate(Description = descriptions) |>
+      dplyr::relocate(c("Subperiod", "Description", "logGDP", "logP", "fedfunds", "VFCI")) |>
+      gt() |>
+      cols_align(align = "center", columns = 3:6) |>
+      tab_spanner(label = "Relative Variance", columns = 3:6)
+
+    tab |>
+      as_latex() |>
+      as.character() |>
+      stringr::str_replace_all("longtable", "tabular") |>
+      writeLines("./output/baseline/tables/table_rel_var.tex")
+
 }
 
 #-------------------------------------------------------------------------------
