@@ -454,6 +454,38 @@ fname <- here::here(paste0(output_dir, "vfci_total_and_resid_vol.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
 
 
+## VFCI compared Stocks VFCI --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_stocks) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), color = "VFCI")) +
+  geom_line(aes(y = scale(vfci_stocks), color = "VFCI - Equity Only")) +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-2, 5) +
+  scale_color_manual(
+    values = c(vfci_color, "#41b6c4"),
+    labels = c("VFCI", "VFCI - Equity Only"),
+    breaks = c("VFCI", "VFCI - Equity Only")
+  )
+
+fname <- here::here(paste0(output_dir, "vfci_and_vfci_stocks.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+
+
 ## Figure Comparing all VFCI series
 
 pcs_wide <-

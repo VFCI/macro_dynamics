@@ -445,6 +445,11 @@ vfci_baseline <- results$fgr1.gdpc1 #results$vfci_lags_in_mean
 #     vfci = vfci_lags_in_mean,
 #     mu = mu_lags_in_mean
 #   )
+
+results$vfci_stocks <-
+  get_vfci(variables, "fgr1.gdpc1", c("gspc_vol", "annual_ret"), prcomp = FALSE, date_begin = date_begin, date_end = date_end)$ts |>
+  rename(vfci_stocks = vfci, mu_stocks = mu)
+
 # merge, tidy NA
 variables <- purrr::reduce(
   list(
