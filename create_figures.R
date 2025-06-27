@@ -76,8 +76,6 @@ p <- ggplot(variables_fig, aes(qtr)) +
   ) +
   ylim(-2, 6)
 
-p %>% print()
-
 fname <- here::here(paste0(output_dir, "FCI_std.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
 
@@ -103,7 +101,6 @@ p <-
   ) +
   scale_color_manual(values = vfci_color)
 
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "just_vfci.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -135,8 +132,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = vfci, y = mu)) +
   theme(
     legend.position = c(0.7, 0.9)
   )
-
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "musigma_gdp.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -171,7 +166,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     values = c(vfci_color, colors[1]),
     labels = c("VFCI", "Consumption-VFCI")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_gdp_and_pce.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -207,7 +201,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     values = c(vfci_color, colors[5]),
     labels = c("VFCI", "VFCI using all financial variables")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_gdp_and_indiv.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -238,7 +231,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     values = c(vfci_color, colors[2]), # c("blue","red"),
     labels = c("VFCI United States", "VFCI Euro Area")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "us_ea_vfci.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -271,7 +263,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(qtr)) +
     values = c(vfci_color, colors[6]),
     labels = c("VFCI", "VFCI with Yields")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_yields.svg"))
 ggsave(fname, width = fig_width, height = fig_height)
@@ -305,7 +296,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
     values = c(vfci_color, "gray30"),
     labels = c("VFCI", "VFCI with lags in mean")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_lags_in_mean.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -337,7 +327,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
     values = c(vfci_color, "gray70"),
     labels = c("VFCI", "VFCI with lags in volatility")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_lags_in_vol.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -368,7 +357,6 @@ p <- ggplot(as.data.frame(variables_fig), aes(x = qtr)) +
     values = c(vfci_color, "gray50"),
     labels = c("VFCI",  "VFCI with lags")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_lags.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -403,7 +391,6 @@ p <- ggplot(variables_fig, aes(x = qtr)) +
     labels = 1:6,
     name = "PCs"
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_pcs.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -413,13 +400,7 @@ ggsave(fname, p, width = fig_width, height = fig_height)
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-variables_fig <- results_pcs |>
-  purrr::map(~ .x$ts) |>
-  purrr::list_rbind(names_to = "pc") |>
-  dplyr::mutate(pc = as.numeric(pc)) |>
-  dplyr::group_by(pc) |>
-  dplyr::mutate(vfci_scaled = scale(vfci)) |>
-  ungroup() |>
+variables_fig <- pcs_df |>
   dplyr::filter(pc %in% 3:5)
 
 p <- ggplot(variables_fig, aes(x = qtr)) +
@@ -437,7 +418,6 @@ p <- ggplot(variables_fig, aes(x = qtr)) +
     labels = 3:5,
     name = "PCs"
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_some_pcs.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
@@ -469,13 +449,19 @@ p <- ggplot(variables_fig, aes(x = qtr)) +
     labels = c("VFCI", "Total Log Vol", "Residual Log Vol"),
     breaks = c("VFCI", "Total Log Vol", "Residual Log Vol")
   )
-p %>% print()
 
 fname <- here::here(paste0(output_dir, "vfci_total_and_resid_vol.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
 
 
 ## Figure Comparing all VFCI series
+
+pcs_wide <-
+  pcs_df |>
+  dplyr::filter(pc %in% c(3, 5)) |>
+  dplyr::mutate(name = paste0("vfci_pc", pc)) |>
+  dplyr::select(qtr, name, vfci) |>
+  tidyr::pivot_wider(names_from = "name", values_from = vfci)
 
 variables_fig <- variables %>%
   dplyr::left_join(results$vfci_lags$ts, by = "qtr") %>%
@@ -484,20 +470,37 @@ variables_fig <- variables %>%
   dplyr::left_join(results$vfci_ea, by = "qtr") %>%
   dplyr::left_join(results$vfci_ind, by = "qtr") %>%
   dplyr::left_join(vfci_cons, by = "qtr") %>%
-  dplyr::select(qtr, vfci, vfci_lags, vfci_lags_in_vol, vfci_lags_in_mean, vfci_ea, vfci_lev, vfci_ind, vfci_pce, total_log_vol, resid_log_vol) %>%
+  dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
+  dplyr::left_join(pcs_wide, by = "qtr") %>%
+  dplyr::left_join(results$vfci_yields, by = "qtr") %>%
+  dplyr::select(qtr, vfci, vfci_pc3, vfci_pc5, vfci_lags, vfci_yields, vfci_lev, vfci_ind, vfci_pce) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
+labels <-
+  c(
+    vfci_pce = "VFCI using consumption",
+    vfci_lev = "exp(VFCI)",
+    vfci_pc3 = "VFCI using 3 PCs",
+    vfci_pc5 = "VFCI using 5 PCs",
+    vfci_ind = "VFCI using all financial variables",
+    vfci_lags = "VFCI with lags of GDP",
+    vfci_yields = "VFCI with yields"
+  )
+
 p <- 
   variables_fig |>
+  mutate(vfci = scale(vfci)) |>
   tidyr::pivot_longer(-c(qtr, vfci)) |>
   group_by(name) |>
-  mutate(value_scaled = scale(value)) |>
+  mutate(value_scaled = scale(value)[, 1]) |>
+  mutate(name = factor(name, levels = names(labels), labels = labels, ordered = TRUE)) |>
   ggplot(aes(x = qtr)) +
   custom_zero_line +
   geom_line(aes(y = vfci), color = vfci_color) +
   geom_line(aes(y = value_scaled), color = "steelblue", alpha = 0.7) +
-  facet_grid(rows = vars(name), scales = "free_y") +
+  #facet_grid(rows = vars(name), scales = "free_y") +
+  facet_wrap(vars(name), scales = "free_y") +
   custom_scale_dates +
   custom_theme +
   labs(
@@ -509,6 +512,5 @@ p <-
     strip.placement = "outside"
   )
 
-
-fname <- here::here(paste0(output_dir, "compare_vfci_time_series.svg"))
+fname <- here::here(paste0("output/appendix/figures/", "compare_vfci_time_series.svg"))
 ggsave(fname, p, width = 5.5, height = 7)
