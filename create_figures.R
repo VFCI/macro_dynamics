@@ -500,7 +500,7 @@ p <-
   geom_line(aes(y = vfci), color = vfci_color) +
   geom_line(aes(y = value_scaled), color = "steelblue", alpha = 0.7) +
   #facet_grid(rows = vars(name), scales = "free_y") +
-  facet_wrap(vars(name), scales = "free_y") +
+  facet_wrap(vars(name), scales = "free_y", ncol = 1) +
   custom_scale_dates +
   custom_theme +
   labs(
@@ -508,9 +508,9 @@ p <-
   ) +
   theme(
     strip.background = element_blank(),
-    strip.text.y.right = element_text(angle = 0, hjust = 0, color = "steelblue"),
+    strip.text.x.top = element_text(angle = 0, hjust = 0.5, color = "steelblue"),
     strip.placement = "outside"
   )
 
 fname <- here::here(paste0("output/appendix/figures/", "compare_vfci_time_series.svg"))
-ggsave(fname, p, width = 5.5, height = 7)
+ggsave(fname, p, width = 5.5, height = 8)
