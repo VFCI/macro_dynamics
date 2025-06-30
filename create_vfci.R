@@ -420,6 +420,7 @@ variables <- purrr::reduce(
 # financial_vars <- c("gspc_vol","gr4.gspc","t10y3m","tb3smffm","aaa10ym","baa_aaa") # old from stata, wrong
 financial_vars <- c("gspc_vol","annual_ret","t10y3m","tb3smffm","aaa10ym","baa_aaa")  # choose returns from # annual_ret_from_daily_avg, annual_cumret_from_quart_daily_avg, annual_avgret_from_quart, annual_ret
 dep_vars <- list("fgr1.gdpc1","fgr1.pcecc96")
+lag_vars <- c("gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1")
 date_begin <- "1962 Q1"
 date_end <- "2022 Q3"
 
@@ -440,15 +441,17 @@ results_pcs <- 1:6 %>%
 
 
 vfci_baseline <- results$fgr1.gdpc1 #results$vfci_lags_in_mean
-# vfci_baseline$ts <- vfci_baseline$ts %>% 
-#   rename(
-#     vfci = vfci_lags_in_mean,
-#     mu = mu_lags_in_mean
-#   )
+
+results$vfci_no_rvol <- get_vfci(variables,"fgr1.gdpc1",c("annual_ret","t10y3m","tb3smffm","aaa10ym","baa_aaa"),prcomp=TRUE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>% 
+  rename(vfci_no_rvol = vfci, mu_no_rvol=mu)
 
 results$vfci_stocks <-
   get_vfci(variables, "fgr1.gdpc1", c("gspc_vol", "annual_ret"), prcomp = FALSE, date_begin = date_begin, date_end = date_end)$ts |>
   rename(vfci_stocks = vfci, mu_stocks = mu)
+
+results$vfci_ret <-
+  get_vfci(variables, "fgr1.gdpc1", c("annual_ret"), prcomp = FALSE, date_begin = date_begin, date_end = date_end)$ts |>
+  rename(vfci_ret = vfci, mu_ret = mu)
 
 # merge, tidy NA
 variables <- purrr::reduce(
@@ -471,7 +474,6 @@ variables <- variables |> mutate(f1.dgs1 = lead(dgs1), f1.dgs5 = lead(dgs5), f1.
 results$vfci_yields <- get_vfci(variables, y = "fgr1.gdpc1", x = c(pcs, "f1.dgs1", "f1.dgs5", "f1.dgs10"), het = c(pcs), prcomp=FALSE, n_prcomp = 4, date_begin=date_begin, date_end=date_end)$ts %>% 
   rename(vfci_yields = vfci, mu_yields = mu)
 
-lag_vars <- c("gr1.gdpc1","lgr1.gdpc1","l2gr1.gdpc1","l3gr1.gdpc1")
 results$vfci_lags <- get_vfci(
     variables,
     "fgr1.gdpc1",

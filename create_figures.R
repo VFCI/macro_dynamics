@@ -460,14 +460,75 @@ date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
   dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
-  dplyr::select(yr, qtr, vfci, vfci_stocks) %>%
+  dplyr::select(yr, qtr, vfci, vfci_stocks, vfci_ret) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
 p <- ggplot(variables_fig, aes(x = qtr)) +
   custom_zero_line +
   geom_line(aes(y = scale(vfci), color = "VFCI")) +
-  geom_line(aes(y = scale(vfci_stocks), color = "VFCI - Equity Only")) +
+  geom_line(aes(y = scale(vfci_stocks), color = "VFCI - Equity Only"), alpha = 0.8) +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-3, 5) +
+  scale_color_manual(
+    values = c(vfci_color, "#41b6c4"),
+    labels = c("VFCI", "VFCI - Equity Only"),
+    breaks = c("VFCI", "VFCI - Equity Only")
+  )
+
+fname <- here::here(paste0(output_dir, "vfci_and_vfci_stocks.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+
+## VFCI compared Rets VFCI --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_ret, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_ret) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), color = "VFCI")) +
+  geom_line(aes(y = scale(vfci_ret), color = "VFCI - Returns Only"), alpha = 0.8) +
+  custom_scale_dates +
+  ylab("Normalized index") +
+  custom_theme +
+  theme(
+    legend.position = custom_legend_position
+  ) +
+  ylim(-3, 5) +
+  scale_color_manual(
+    values = c(vfci_color, "#6977de"),
+    labels = c("VFCI", "VFCI - Returns Only"),
+    breaks = c("VFCI", "VFCI - Returns Only")
+  )
+
+fname <- here::here(paste0(output_dir, "vfci_and_vfci_rets.svg"))
+ggsave(fname, p, width = fig_width, height = fig_height)
+
+## VFCI compare without Realized Vol --------------------------------------
+date_begin <- "1960 Q1"
+date_end <- "2022 Q3"
+
+variables_fig <- variables %>%
+  dplyr::left_join(results$vfci_no_rvol, by = "qtr") %>%
+  dplyr::select(yr, qtr, vfci, vfci_no_rvol) %>%
+  tsibble::as_tsibble() %>%
+  tsibble::filter_index(date_begin ~ date_end)
+
+p <- ggplot(variables_fig, aes(x = qtr)) +
+  custom_zero_line +
+  geom_line(aes(y = scale(vfci), color = "VFCI")) +
+  geom_line(aes(y = scale(vfci_no_rvol), color = "VFCI - no Realized Vol")) +
   custom_scale_dates +
   ylab("Normalized index") +
   custom_theme +
@@ -477,11 +538,11 @@ p <- ggplot(variables_fig, aes(x = qtr)) +
   ylim(-2, 5) +
   scale_color_manual(
     values = c(vfci_color, "#41b6c4"),
-    labels = c("VFCI", "VFCI - Equity Only"),
-    breaks = c("VFCI", "VFCI - Equity Only")
+    labels = c("VFCI", "VFCI - no Realized Vol"),
+    breaks = c("VFCI", "VFCI - no Realized Vol")
   )
 
-fname <- here::here(paste0(output_dir, "vfci_and_vfci_stocks.svg"))
+fname <- here::here(paste0(output_dir, "vfci_and_vfci_no_rvol.svg"))
 ggsave(fname, p, width = fig_width, height = fig_height)
 
 
@@ -503,9 +564,11 @@ variables_fig <- variables %>%
   dplyr::left_join(results$vfci_ind, by = "qtr") %>%
   dplyr::left_join(vfci_cons, by = "qtr") %>%
   dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
+  dplyr::left_join(results$vfci_ret, by = "qtr") %>%
   dplyr::left_join(pcs_wide, by = "qtr") %>%
   dplyr::left_join(results$vfci_yields, by = "qtr") %>%
-  dplyr::select(qtr, vfci, vfci_pc3, vfci_pc5, vfci_lags, vfci_yields, vfci_lev, vfci_ind, vfci_pce) %>%
+  dplyr::left_join(results$vfci_no_rvol, by = "qtr") %>%
+  dplyr::select(qtr, vfci, vfci_no_rvol, vfci_pc3, vfci_pc5, vfci_lags, vfci_yields, vfci_lev, vfci_ind, vfci_pce) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
@@ -517,7 +580,8 @@ labels <-
     vfci_pc5 = "VFCI using 5 PCs",
     vfci_ind = "VFCI using all financial variables",
     vfci_lags = "VFCI with lags of GDP",
-    vfci_yields = "VFCI with yields"
+    vfci_yields = "VFCI with yields",
+    vfci_no_rvol = "VFCI no Realized Volatility"
   )
 
 p <- 
@@ -543,6 +607,8 @@ p <-
     strip.text.x.top = element_text(angle = 0, hjust = 0.5, color = "steelblue"),
     strip.placement = "outside"
   )
+
+p
 
 fname <- here::here(paste0("output/appendix/figures/", "compare_vfci_time_series.svg"))
 ggsave(fname, p, width = 5.5, height = 8)
