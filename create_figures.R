@@ -460,7 +460,7 @@ date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
   dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
-  dplyr::select(yr, qtr, vfci, vfci_stocks, vfci_ret) %>%
+  dplyr::select(yr, qtr, vfci, vfci_stocks) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
 
@@ -574,14 +574,14 @@ variables_fig <- variables %>%
 
 labels <-
   c(
-    vfci_pce = "VFCI using consumption",
+    vfci_pce = "VFCI using consumption growth",
     vfci_lev = "exp(VFCI)",
-    vfci_pc3 = "VFCI using 3 PCs",
-    vfci_pc5 = "VFCI using 5 PCs",
+    vfci_pc3 = "VFCI using 3 PCs of financial variables",
+    vfci_pc5 = "VFCI using 5 PCs of fianncial variables",
     vfci_ind = "VFCI using all financial variables",
-    vfci_lags = "VFCI with lags of GDP",
-    vfci_yields = "VFCI with yields",
-    vfci_no_rvol = "VFCI no Realized Volatility"
+    vfci_lags = "VFCI with four lags of real GDP growth",
+    vfci_yields = "VFCI with contemperaneous yields at 1, 5, and 10 year maturity",
+    vfci_no_rvol = "VFCI no realized volatility"
   )
 
 p <- 
