@@ -240,7 +240,7 @@ if (type == "1M") {
 ncore = 1   
 
 # Output file
-filename = paste0("output/mcmc_out_",type)
+filename = paste0("output/analysis_data/mcmc_out_",type)
 if (type == "baseline") {
   filename_overleaf = paste0("output/baseline/figures/mcmc_out_",type)
 } else {

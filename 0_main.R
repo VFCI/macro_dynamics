@@ -52,9 +52,6 @@ source('4_internal_vfci_var_output.R')
 
 source('4b_internal_vfci_var_figures.R')
 
-## MDD -------------------------------------------------------------------------
-source("calculate_mdd.R")
-
 
 # Robustness of the five identification schemes --------------------------------
 
@@ -103,6 +100,8 @@ for (i in vol_bvar_robustness_a) {
   source('1_vol_bvar_estimation.R')
   source('1_vol_bvar_output.R')
 }
+
+## MDD -------------------------------------------------------------------------
  
 vol_bvar_robustness_b <- c("horserace_gz", "horserace_tedr", "horserace_ecy", "horserace_nfci")  
 for (i in vol_bvar_robustness_b) {

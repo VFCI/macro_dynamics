@@ -3,7 +3,7 @@ library(ggplot2)
 library(patchwork)
 library(gt)
 
-load('output/res_ins_data.Rdata') ## data_res
+load('output/analysis_data/res_ins_data.Rdata') ## data_res
 
 # Non-normality of BVAR structural shocks and Q-Q plots
 shock_type <- grep("^sf_bvar", names(data_res), value = TRUE)

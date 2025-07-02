@@ -107,7 +107,7 @@ names(data_res) <- colnames_data_res
 
 rm(suffix,mod_names,vfci_ins,rf_residuals,bvar_sf_res,svariv_sf_res_ff,svariv_sf_res_y,chol_sf_res_vfci,df_res_names_rf,df_res_names_sf,colnames_data_res)
 
-save(data_res,file = 'output/res_ins_data.Rdata')
+save(data_res,file = 'output/analysis_data/res_ins_data.Rdata')
 
 #-------------------------------------------------------------------------------
 # 1. Correlation matrix of BVAR structural shocks

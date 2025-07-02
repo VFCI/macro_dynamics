@@ -49,7 +49,7 @@ if (avg_regime == 1) {
 	            aplus = mcmc_output$aout[,,thin]
 	)
 	
-	save(ir,file = paste(filename,'_ir.Rdata',sep=''))
+	save(ir, var_names, shock_names, file = paste(filename,'_ir.Rdata',sep=''))
 
     #--------------------------------------------------
     #VFCI shock

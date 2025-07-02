@@ -34,7 +34,7 @@ n_reg          <<- length(regime_dates) + 1 # number of variance regimes
 #############################################################
 
 # Save output
-save(optout,file = 'output/gmode.Rdata')
+save(optout,file = 'output/analysis_data/gmode.Rdata')
 
 #-------------------------------------------------------------------------------
 # Gibbs sampling
@@ -97,7 +97,7 @@ if (my_choice == 'gaussian'){
 }
 
 # Save output
-save(mdd_output,file = paste0('output/gibbs_out_',type,'.Rdata'))
+save(mdd_output,file = paste0('output/analysis_data/gibbs_out_',type,'.Rdata'))
 
 
 #-------------------------------------------------------------------------------

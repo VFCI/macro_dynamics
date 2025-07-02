@@ -11,8 +11,8 @@ fig_width <- 5.5 # in inches
 fig_height <- fig_width / 1.618 # in inches
 
 ## Load data
-base::load("./output/svar_internal_vfci.Rdata")
-base::load("./output/svariv_lpiv_chol_sn_baseline.Rdata")
+base::load("./output/analysis_data/svar_internal_vfci.Rdata")
+base::load("./output/analysis_data/svariv_lpiv_chol_sn_baseline.Rdata")
 
 ## VFCI and Internal VFCI ----------------------------------------------
 date_begin <- "1960 Q1"

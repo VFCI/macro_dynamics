@@ -1,11 +1,11 @@
 library(gt)
 
 ## MDD for t-distribution BVAR
-load("./output/gibbs_out_baseline.Rdata")
+load("./output/analysis_data/gibbs_out_baseline.Rdata")
 mdd_t <- mdd_output$mout[1]
 
 ## MDD for N-distribution BVAR
-load("./output/gibbs_out_normal.Rdata")
+load("./output/analysis_data/gibbs_out_normal.Rdata")
 mdd_n <- mdd_output$mout[1]
 
 ## Time Varying A(L) over regimes

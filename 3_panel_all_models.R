@@ -2,8 +2,8 @@
 #-------------------------------------------------------------------------------
 
 # Load data
-filename_mc = paste0("output/","mcmc_out_",type,"_ir",".Rdata")
-filename_iv = paste0("output/","svariv_lpiv_chol_sn_",type,".Rdata")
+filename_mc = paste0("output/analysis_data/","mcmc_out_",type,"_ir",".Rdata")
+filename_iv = paste0("output/analysis_data/","svariv_lpiv_chol_sn_",type,".Rdata")
 base::load(filename_mc)
 base::load(filename_iv)
 
