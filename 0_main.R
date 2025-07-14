@@ -152,3 +152,24 @@ for (i in vol_bvar_robustness_e) {
   source('1_vol_bvar_estimation.R')
   source('1_vol_bvar_output.R')
 }
+
+
+## Robustness of VFCI Variations
+vol_bvar_robustness_f <- c(
+  "variation_vfci_pce",
+  "variation_vfci_lev",
+  "variation_vfci_pc3",
+  "variation_vfci_pc5",
+  "variation_vfci_ind",
+  "variation_vfci_lags",
+  "variaton_vfci_yields",
+  "variation_vfci_no_rvol",
+  "variation_vfci_stocks",
+  "variation_vfci_ret"
+)
+for (i in vol_bvar_robustness_f) {
+  type = i
+  source('1_vol_bvar_calibration.R')
+  source('1_vol_bvar_estimation.R')
+  source('1_vol_bvar_output.R')
+}

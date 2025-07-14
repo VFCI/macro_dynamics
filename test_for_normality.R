@@ -60,7 +60,7 @@ sw_df$Test <- "Normality"
 
 df <- list(
   mardia_df |> mutate(model = "Mardia"),
-  sw_df |> mutate(model = "Shapiro-Wilks")
+  sw_df |> mutate(model = "Shapiro-Wilk")
 ) |>
   purrr::list_rbind()
 
@@ -69,7 +69,7 @@ tb <-
   df |>
   dplyr::arrange(model, Test, name) |>
   tidyr::pivot_wider(names_from = c(model, Test, name), values_from = value, names_sep = "_") |>
-  gt(rowname_col = "Variable") |>
+  gt() |>
   tab_spanner_delim(
     delim = "_"
   ) |>
@@ -101,9 +101,12 @@ p2 <- qq_plot(vars_for_corr, "Log Core PCE")
 p3 <- qq_plot(vars_for_corr, "VFCI")
 p4 <- qq_plot(vars_for_corr, "Fed Funds")
 
-p <- (p1 | p2) / (p3 | p4)
+p <- (p1 | p2 | p3 | p4)
 
-ggsave("./output/appendix/figures/qq-plots.svg", width = 5, height = 5)
+ggsave("./output/appendix/figures/qq-plots.svg", width = 6, height = 2)
+
+
+
 
 
 

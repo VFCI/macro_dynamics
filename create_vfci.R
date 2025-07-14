@@ -428,6 +428,8 @@ results <- dep_vars %>%
   purrr::set_names() %>% 
   purrr::map(~get_vfci(variables,.,financial_vars,prcomp=TRUE,n_prcomp = 4,date_begin=date_begin, date_end=date_end))
 
+vfci_cons <- dplyr::select(results$fgr1.pcecc96$ts, c("qtr", "vfci")) %>% dplyr::rename(vfci_pce = vfci)
+
 results$vfci_ind <- get_vfci(variables,"fgr1.gdpc1",financial_vars,prcomp=FALSE,n_prcomp = 4,date_begin=date_begin, date_end=date_end)$ts %>% 
   rename(vfci_ind = vfci, mu_ind=mu)
 
@@ -454,14 +456,8 @@ results$vfci_ret <-
   rename(vfci_ret = vfci, mu_ret = mu)
 
 # merge, tidy NA
-variables <- purrr::reduce(
-  list(
-    variables, 
-    vfci_baseline$ts
-    ),
-  dplyr::inner_join, 
-  by = "qtr"
-)
+variables <- variables |> 
+  dplyr::full_join(vfci_baseline$ts, by = "qtr")
 
 variables <-
   variables |>
@@ -520,6 +516,36 @@ results$vfci_lags_in_vol$ts <- results$vfci_lags_in_vol$ts %>%
   )
 
 
+## Clean up the VFCI_pc# series
+pcs_df <- results_pcs |>
+  purrr::map(~ .x$ts) |>
+  purrr::list_rbind(names_to = "pc") |>
+  dplyr::mutate(pc = as.numeric(pc)) |>
+  dplyr::group_by(pc) |>
+  dplyr::mutate(vfci_scaled = scale(vfci)) |>
+  ungroup()
+
+pcs_wide <-
+  pcs_df |>
+  dplyr::mutate(name = paste0("vfci_pc", pc)) |>
+  dplyr::select(qtr, name, vfci) |>
+  tidyr::pivot_wider(names_from = "name", values_from = vfci)
+
+
+## Merge on all of the VFCI robustness
+variables <- variables |>
+  dplyr::full_join(results$vfci_lags$ts, by = "qtr") %>%
+  dplyr::full_join(results$vfci_lags_in_vol$ts, by = "qtr") %>%
+  dplyr::full_join(results$vfci_lags_in_mean$ts, by = "qtr") %>%
+  dplyr::full_join(results$vfci_ea, by = "qtr") %>%
+  dplyr::full_join(results$vfci_ind, by = "qtr") %>%
+  dplyr::full_join(vfci_cons, by = "qtr") %>%
+  dplyr::full_join(results$vfci_stocks, by = "qtr") %>%
+  dplyr::full_join(results$vfci_ret, by = "qtr") %>%
+  dplyr::full_join(pcs_wide, by = "qtr") %>%
+  dplyr::full_join(results$vfci_yields, by = "qtr") %>%
+  dplyr::full_join(dplyr::select(results$vfci_no_rvol, qtr, vfci_no_rvol), by = "qtr")
+
 # Save ---------------------------------------------------------------------
 
 # save and export
@@ -555,7 +581,11 @@ variables <- variables %>%
     "gsfci","ecy","ebp","gz","ciss",
     "pc1","pc2","pc3","pc4","pc5","pc6",
     "mu","vfci","vfci_lev"
-    )) 
+    ))
 
+variables <- variables |>
+  tsibble::as_tsibble(index = qtr) |>
+  tsibble::filter_index(date_begin ~ date_end)
+  
 save(variables, file = here::here("variables.RData"))
 

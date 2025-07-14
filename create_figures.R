@@ -141,10 +141,7 @@ ggsave(fname, p, width = fig_width, height = fig_height)
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
-vfci_cons <- dplyr::select(results$fgr1.pcecc96$ts, c("qtr", "vfci")) %>% dplyr::rename(vfci_pce = vfci)
-
 variables_fig <- variables %>%
-  dplyr::inner_join(vfci_cons, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_pce) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end) %>%
@@ -177,7 +174,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::inner_join(results$vfci_ind, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_ind) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -210,7 +206,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_ea, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_ea) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -241,7 +236,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_yields, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_yields) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -275,7 +269,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_lags_in_mean$ts, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_lags_in_mean) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -306,7 +299,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_lags_in_vol$ts, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_lags_in_vol) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -336,7 +328,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_lags$ts, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_lags) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -365,14 +356,6 @@ ggsave(fname, p, width = fig_width, height = fig_height)
 ## VFCI with all PCs --------------------------------------
 date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
-
-pcs_df <- results_pcs |>
-  purrr::map(~ .x$ts) |>
-  purrr::list_rbind(names_to = "pc") |>
-  dplyr::mutate(pc = as.numeric(pc)) |>
-  dplyr::group_by(pc) |>
-  dplyr::mutate(vfci_scaled = scale(vfci)) |>
-  ungroup()
 
 variables_fig <- pcs_df
 
@@ -459,7 +442,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_stocks) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -490,7 +472,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_ret, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_ret) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -520,7 +501,6 @@ date_begin <- "1960 Q1"
 date_end <- "2022 Q3"
 
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_no_rvol, by = "qtr") %>%
   dplyr::select(yr, qtr, vfci, vfci_no_rvol) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
@@ -549,25 +529,7 @@ ggsave(fname, p, width = fig_width, height = fig_height)
 
 ## Figure Comparing all VFCI series
 
-pcs_wide <-
-  pcs_df |>
-  dplyr::filter(pc %in% c(3, 5)) |>
-  dplyr::mutate(name = paste0("vfci_pc", pc)) |>
-  dplyr::select(qtr, name, vfci) |>
-  tidyr::pivot_wider(names_from = "name", values_from = vfci)
-
 variables_fig <- variables %>%
-  dplyr::left_join(results$vfci_lags$ts, by = "qtr") %>%
-  dplyr::left_join(results$vfci_lags_in_vol$ts, by = "qtr") %>%
-  dplyr::left_join(results$vfci_lags_in_mean$ts, by = "qtr") %>%
-  dplyr::left_join(results$vfci_ea, by = "qtr") %>%
-  dplyr::left_join(results$vfci_ind, by = "qtr") %>%
-  dplyr::left_join(vfci_cons, by = "qtr") %>%
-  dplyr::left_join(results$vfci_stocks, by = "qtr") %>%
-  dplyr::left_join(results$vfci_ret, by = "qtr") %>%
-  dplyr::left_join(pcs_wide, by = "qtr") %>%
-  dplyr::left_join(results$vfci_yields, by = "qtr") %>%
-  dplyr::left_join(results$vfci_no_rvol, by = "qtr") %>%
   dplyr::select(qtr, vfci, vfci_no_rvol, vfci_pc3, vfci_pc5, vfci_lags, vfci_yields, vfci_lev, vfci_ind, vfci_pce) %>%
   tsibble::as_tsibble() %>%
   tsibble::filter_index(date_begin ~ date_end)
