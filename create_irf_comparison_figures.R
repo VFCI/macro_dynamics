@@ -513,3 +513,69 @@ p <-
 
 fname <- "output/appendix/figures/compare_resid_total_log_vol_irfs.svg"
 ggsave(fname, p, width = 4.5, height = 5.5)
+
+
+## Internal VAR VFCI Comparison
+dt_baseline <- get_irf_data("baseline")
+
+dt_robust <- purrr::list_rbind(list(
+  get_irf_data("int_vfci")
+))
+
+dt_robust <- dt_robust |>
+  mutate(variable = as.character(variable)) |>
+  mutate(variable = ifelse(variable == "Internal VFCI", "VFCI", variable)) |>
+  mutate(variable = factor(variable, levels = c("Log Real GDP", "Log Core PCE", "VFCI", "Fed Funds") ))
+
+
+p <- 
+  ggplot() +
+  geom_line(
+    data = dplyr::filter(dt_baseline, shock == "VFCI shock"),
+    aes(x = period, y = irf, color = type)
+  ) +
+  geom_ribbon(
+    data = dplyr::filter(dt_baseline, shock == "VFCI shock"),
+    aes(x = period, ymin = irf_lb2, ymax = irf_ub2),
+    fill = green_color, alpha = 0.25
+  ) +
+  geom_ribbon(
+    data = dplyr::filter(dt_baseline, shock == "VFCI shock"),
+    aes(x = period, ymin = irf_lb1, ymax = irf_ub1),
+    fill = green_color, alpha = 0.5
+  ) +
+  geom_line(
+    data = dplyr::filter(dt_robust, shock == "Internal VFCI shock"),
+    aes(x = period, y = irf, group = type,  color = "int_vfci"),
+    alpha = 0.5
+  ) +
+  facet_wrap(vars(variable), scales = "free_y", ncol = 2) +
+  scale_x_continuous(limits = c(1, 20), expand = c(0, 0)) +
+  custom_zero_line +
+  custom_theme +
+  scale_color_manual(
+    name = "VFCI Version",
+    values = c(baseline = green_color, int_vfci = "#990099"),
+    labels = c(baseline = "Baseline", int_vfci = "Internal VFCI")
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  guides(
+    color = guide_legend(nrow = 1)
+  ) +
+  theme(
+    strip.placement = "outside",
+    strip.background = element_blank(),
+    strip.text.y.left = element_text(angle = 90),
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.justification = 0.5,
+    legend.text = element_text(margin = margin(0,40,0,5))
+  )
+
+p
+
+fname <- here::here(paste0("output/appendix/figures/", "compare_int_vfci_irfs.svg"))
+ggsave(fname, p, width = 4.5, height = 4)

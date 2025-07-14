@@ -25,6 +25,10 @@ vfci_data$int_vfci <- predict(hr$lm2_adj, newdata = vfci_data[, pc_vars])
 
 comp_vfci_int_vfci_data <- vfci_data[, c("date", "vfci", "int_vfci")]
 
+variables <-
+  variables |>
+  left_join(vfci_data[, c("qtr", "int_vfci")], by = "qtr")
+
 #--------------------------------------------------------------------
 #Model 1: Cholesky
 #--------------------------------------------------------------------

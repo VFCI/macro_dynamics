@@ -52,6 +52,11 @@ source('4_internal_vfci_var_output.R')
 
 source('4b_internal_vfci_var_figures.R')
 
+## Run Internal VFCI in heteroskedastic BVAR
+type = "int_vfci"
+source('1_vol_bvar_calibration.R')
+source('1_vol_bvar_estimation.R')
+source('1_vol_bvar_output.R')
 
 # Robustness of the five identification schemes --------------------------------
 

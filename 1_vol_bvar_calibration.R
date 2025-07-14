@@ -117,6 +117,12 @@ if (type == "baseline" | type == "pre_crisis" | type == "100k" | type == "1M" | 
   shock_names    <- c("Real GDP shock", "Core PCE shock", "Resid Log Vol shock", "Fed Funds shock")
   yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
   yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
+} else if (type == "int_vfci") {
+  vars_in_system <- c('lgdp','lpce','int_vfci','fedfunds') 
+  var_names      <- c("Log Real GDP", "Log Core PCE", "Internal VFCI", "Fed Funds")
+  shock_names    <- c("Real GDP shock", "Core PCE shock", "Internal VFCI shock", "Fed Funds shock")
+  yaxis_vfci_shock     <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.005,0.01),c(-0.005,0.005),c(-0.2,0.2),c(-0.2,0.5))
+  yaxis_vfci_response  <- list(c(NA,NA), c(NA,NA), c(NA,NA), c(NA,NA)) #list(c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5),c(-0.5,0.5))
 } else if (grepl("variation_", type)) {
   vfci_var <- stringr::str_extract(type, "(?<=variation_).*$")
   vars_in_system <- c('lgdp','lpce', vfci_var,'fedfunds') 
