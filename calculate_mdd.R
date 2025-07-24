@@ -56,7 +56,7 @@ df <- tibble(
 tb_latex <-
   gt(df) |>
   fmt_number(decimals = 0) |> 
-  fmt_markdown(columns = 1) |>
+  fmt_markdown(columns = 2) |>
   cols_align(align = "left", columns = c(1,2)) |>
   as_latex() |>
   as.character() |>
