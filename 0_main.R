@@ -107,7 +107,8 @@ for (i in vol_bvar_robustness_a) {
 }
 
 ## MDD -------------------------------------------------------------------------
- 
+source("calculate_mdd.R")
+
 vol_bvar_robustness_b <- c("horserace_gz", "horserace_tedr", "horserace_ecy", "horserace_nfci")  
 for (i in vol_bvar_robustness_b) {
   type = i
