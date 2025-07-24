@@ -9,7 +9,7 @@ if (avg_regime == 1 & type == "baseline") {
     lambda_median = apply(lambda, c(1,2), median); # taking the median across draws
     lambda_median <- format(round(lambda_median, 2))
     table_rel_variance <- as.data.frame(lambda_median)
-    colnames(table_rel_variance) <- c("1962Q1-1979Q3", "1979Q3-1982Q4", "1983Q1-1989Q4", "1990Q1-2007Q4", "2008Q1-2010Q4", "2011Q1-2019Q4", "2020Q1-2022Q3")
+    colnames(table_rel_variance) <- c("1962Q1-1979Q3", "1979Q4-1982Q4", "1983Q1-1989Q4", "1990Q1-2007Q4", "2008Q1-2010Q4", "2011Q1-2019Q4", "2020Q1-2022Q3")
     table_rel_variance$variable <- c("logGDP", "logP", "VFCI", "fedfunds")
 
     descriptions <- c("Oil crisis, stagflation", "Volcker disinflation", "S&L crisis defaults", "Great Moderation", "Financial crisis", "ZLB, post-crisis recovery", "Covid-19 pandemic")
@@ -17,6 +17,11 @@ if (avg_regime == 1 & type == "baseline") {
     tab <-
       table_rel_variance |>
       tidyr::pivot_longer(-variable, names_to = "Subperiod") |>
+      group_by(variable) |>
+      mutate(value = as.numeric(value), avg = mean(value)) |>
+      mutate(value = round(value / avg, 2)) |>
+      mutate(avg = NULL) |>
+      ungroup() |>
       tidyr::pivot_wider(names_from = "variable", values_from = "value") |>
       mutate(Description = descriptions) |>
       dplyr::relocate(c("Subperiod", "Description", "logGDP", "logP", "fedfunds", "VFCI")) |>
